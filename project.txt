@@ -32,7 +32,7 @@
 
 (1) 메인 페이지 (고객용)
 
-- 커피 메뉴 표시
+- 커피 메뉴 표시 (아메리카노, 라떼, 바딜라라때, 카라멜라떼, 가격)
 - 주문 버튼 및 폼 (이름, 수량, hot/ice)
 - 커피 준비중 화면
 - 커피 완성됫어요 화면 (touch)
@@ -161,16 +161,16 @@ hot/cold 
 
 -color--------------------------------------------------------------------------
 
-&#x20; \--color-text: #3E2723; /\* 진한 갈색(Dark Brown): 커피를 떠올리는 어두운 갈색, 텍스트에 사용 \*/
+--color-text: #3E2723; /\* 진한 갈색(Dark Brown): 커피를 떠올리는 어두운 갈색, 텍스트에 사용 \*/
 
-&#x20; \--color-primary: #6F4E37; /\* 따뜻한 커피 브라운(Coffee Brown): 부드럽고 진한 느낌, 주요 영역에 사용 \*/
+--color-primary: #6F4E37; /\* 따뜻한 커피 브라운(Coffee Brown): 부드럽고 진한 느낌, 주요 영역에 사용 \*/
 
-&#x20; \--color-primary-light: #D7CCC8; /\* 크리미 라떼(Creamy Latte): primary보다 연한 베이지 계열의 색상 \*/
+--color-primary-light: #D7CCC8; /\* 크리미 라떼(Creamy Latte): primary보다 연한 베이지 계열의 색상 \*/
 
-&#x20; \--color-accent: #FF8A65; /\* 포근한 오렌지(Warm Orange): 강조색으로 버튼이나 주요 액션에 사용 \*/
+--color-accent: #FF8A65; /\* 포근한 오렌지(Warm Orange): 강조색으로 버튼이나 주요 액션에 사용 \*/
 
-&#x20; \--color-accent-light: #FFCCBC; /\* 연한 살구색(Soft Peach): accent보다 더 부드럽고 연한 강조색 \*/
+--color-accent-light: #FFCCBC; /\* 연한 살구색(Soft Peach): accent보다 더 부드럽고 연한 강조색 \*/
 
-&#x20; \--color-bg: #F9F5F1; /\* 크림 아이보리(Cream Ivory): 부드럽고 따뜻한 느낌의 배경색 \*/
+--color-bg: #F9F5F1; /\* 크림 아이보리(Cream Ivory): 부드럽고 따뜻한 느낌의 배경색 \*/
 
-}
+
