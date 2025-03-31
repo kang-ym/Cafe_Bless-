@@ -30,6 +30,9 @@ img{
 li{
     list-style: none;
 }
+input[type = 'radio']{
+    display: none;
+}
 
 /* common */
 body{
@@ -94,45 +97,184 @@ header{
 }
 
 /* main */
+
+/* ticker anmation */
+.ticker-box{
+    overflow: hidden;
+}
+.ticker-box p{
+    white-space: nowrap;/* 한 줄 */
+    width: fit-content; /* 안 내용물 다 선택 */
+    background-color: var(--color-text);
+    color: #fff;
+    padding: 4px;
+    text-indent: 4em; /* 4글자 정도  이동*/
+    animation: ticker 12s infinite linear;
+    >span{
+        margin-left: 4em;
+    }
+}
+
+@keyframes ticker{
+    0%{transform: translateX(0);}
+    100%{transform: translateX(-50%);}
+}
+
+/* order box */
+.order-box{
+    width: 100%;
+    background-color: var(--color-primary);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+#orderResult{
+    color: var(--color-bg);
+    text-align: center;
+}
+
+
 .coffee-container{
+    margin-bottom: 20px;
+}
+
+/* select box */
+.select-box{
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 30px 20px;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap: 30px 20px;   
+    margin-bottom: 10px; 
+}
+.coffe-box{
+    position: relative;
+    width: 100%;
+    color: var(--color-text);
 }
 h3{
-    font-size: 1.5rem;
-    padding: 6px 10px;
-    margin-bottom: 10px;
-    color: var(--color-text);
-    border-left: 4px solid var(--color-accent);
-}
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    background-color: var(--color-bg);
+    opacity: .8;
+    font-size: 1.3rem;
+    font-weight: bold;
+    transition: .3s;
+}   
+
 .img-box{
-    border-radius: 0 16px 0 16px;
-    aspect-ratio: 2/1.3;
+    width: 100%;
+    aspect-ratio: 2/1.5;
     margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 3px 3px 10px var(--color-text);
 }
 .img-box img{
     object-fit: cover;
     width: 100%;
     height: 100%;
+    transition: .3s;
 }
 .Price{
     text-align: right;
-    margin-bottom: 10px;
 }
-.info-box{
-    margin-bottom: 10px;
-}
-.input-box{
-    margin-bottom: 8px;
+.coffe-box label:hover .img-box img{
+    transform: scale(1.1);
 }
 
+/* info-box */
+.info-box{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+
+.hot-radio {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    gap: 40px;
+    padding: 20px 0 10px;
+    > label{
+        > i{
+            font-size: 1.8rem;
+            color: var(--color-primary);
+            transition: .3s;
+        }
+    } 
+}
+.fa-fire:hover{
+    transform: scale(1.1);
+    color: #ff6565;
+}
+.fa-snowflake:hover{
+    transform: scale(1.1);
+    color: #65d1ff;
+}
+.size-radio{
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    gap: 50px;
+    padding: 20px 40px;
+    > label {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--color-primary);
+        transition: .3s;
+        &:hover{
+            transform: scale(1.1);
+            color: var(--color-accent);
+        }
+    }
+}
+.customer-name{
+    width: 50%;
+    text-align: center;
+    >label{
+        padding-right: 10px;
+    }
+    >input{
+        text-align: center;
+        height: 25px;
+    }
+}
+.coffee-quantity{
+    width: 50%;
+    text-align: center;
+    >label{
+        padding-right: 10px;
+    }
+    >input{
+        text-align: center;
+        width: 50px;
+        height: 25px;
+
+    }
+}
+/* btn */
 .order-btn{
     display: block;
     width: 90%;
     margin: 0 auto;
-    padding: 8px;
+    padding: 10px;
+    border-radius: 16px;
+    outline: none;
+    border: none;
+    background-color: var(--color-accent-light);
+    color: var(--color-text);
+    font-size: 1.1rem;
+    font-weight: bold;
     font-size: 1rem;
+    transition: .3s;
+    &:hover{
+        background-color: var(--color-accent);
+        color: var(--color-bg);
+        text-shadow: 0 0 5px var(--color-text);
+        box-shadow:  0 0 10px var(--color-accent);
+        
+    }
 }
 /* footer */
 footer{
