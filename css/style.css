@@ -246,6 +246,23 @@ h3{
 
     }
 }
+/* hot / cold 선택 시 스타일 고정 */
+.hot-radio label.active > i.fa-fire {
+    transform: scale(1.1);
+    color: #ff6565;
+}
+.hot-radio label.active > i.fa-snowflake {
+    transform: scale(1.1);
+    color: #65d1ff;
+}
+
+/* R / L 선택 시 스타일 고정 */
+.size-radio label.active {
+    transform: scale(1.1);
+    color: var(--color-accent); /* 주황색 */
+}
+
+
 /* btn */
 .order-btn{
     display: block;
