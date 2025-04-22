@@ -34,13 +34,18 @@ function updateSizeSelection() {
 // ✅ 주문 버튼 클릭 처리
 function handleOrder() {
   const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
-  const coffeeLabel = selectedCoffee?.nextElementSibling.querySelector('h3').dataset.en;
+  const coffeeBox = selectedCoffee.closest('.coffe-box');
+  const coffeeLabel = coffeeBox.querySelector('h3')?.dataset.en;
 
   const hotOrCold = document.querySelector('.hot-radio input:checked')?.value;
-  
   const size = document.querySelector('.size-radio input:checked')?.value.toUpperCase();
-  
-  const name = nameInput.value || "No Name";
+
+  const name = nameInput.value.trim();
+  if (!name) {
+    orderResult.textContent = '注文者の名前を入力してください。';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
   const quantity = parseInt(quantityInput.value, 10);
 
   if (!coffeeLabel || !hotOrCold || !size || isNaN(quantity) || quantity < 1) {
@@ -48,11 +53,14 @@ function handleOrder() {
     return;
   }
 
-  const pricePerCup = (size === 'L') ? 250 : 200;
+  // ✅ 가격 정보 가져오기
+  const priceElement = coffeeBox.querySelector('.Price');
+  const pricePerCup = parseInt(priceElement.dataset[`price${size.toLowerCase()}`], 10);
   const totalPrice = pricePerCup * quantity;
 
-  const summary = `${coffeeLabel}, ${size}, ${hotOrCold}, ${quantity}杯, 注文者: ${name}, 合計: ${totalPrice}円`;
+  const summary = `注文者: ${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, 合計: ${totalPrice}円ご注文ありがとうございます。`;
   orderResult.textContent = summary;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const orderData = {
     coffee: coffeeLabel,
@@ -63,7 +71,6 @@ function handleOrder() {
     price: totalPrice
   };
   localStorage.setItem('lastOrder', JSON.stringify(orderData));
-  
 }
 
 // ✅ 이벤트 연결

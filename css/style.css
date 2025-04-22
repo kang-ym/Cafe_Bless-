@@ -39,6 +39,7 @@ body{
     display: flex;
     flex-direction: row-reverse;
     font-family: var(--font-E-J);
+    background-color: #FFF8F2;
 }   
 /* wrapper */
 .wrapper{
@@ -94,13 +95,14 @@ header{
 /* ticker anmation */
 .ticker-box{
     overflow: hidden;
+    margin-bottom: 10px;
 }
 .ticker-box p{
     white-space: nowrap;/* 한 줄 */
     width: fit-content; /* 안 내용물 다 선택 */
     background-color: var(--color-text);
     color: #fff;
-    padding: 4px;
+    padding: 6px;
     text-indent: 4em; /* 4글자 정도  이동*/
     animation: ticker 12s infinite linear;
     >span{
@@ -119,6 +121,8 @@ header{
     background-color: var(--color-primary);
     padding: 10px;
     margin-bottom: 10px;
+    border-radius: 16px;
+    box-shadow: 3px 3px 5px var(--color-text);
 }
 #orderResult{
     color: var(--color-bg);
@@ -152,6 +156,8 @@ h3{
     opacity: .8;
     font-size: 1.3rem;
     font-weight: bold;
+    text-shadow:  0 0 2px var(--color-text);
+    border-radius: 0 0 16px 0;
     transition: .3s;
 }   
 
@@ -161,6 +167,8 @@ h3{
     margin-bottom: 10px;
     overflow: hidden;
     box-shadow: 3px 3px 10px var(--color-text);
+    border-radius: 0 24px 0 24px;
+    overflow: hidden;
 }
 .img-box img{
     object-fit: cover;
@@ -272,18 +280,19 @@ h3{
     border-radius: 16px;
     outline: none;
     border: none;
-    background-color: var(--color-accent-light);
-    color: var(--color-text);
-    font-size: 1.1rem;
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    font-size: 1.6rem;
     font-weight: bold;
     font-size: 1rem;
+    text-shadow: 0 0 2px var(--color-bg);
+    box-shadow: 0 2px 5px var(--color-primary);
     transition: .3s;
     &:hover{
         background-color: var(--color-accent);
         color: var(--color-bg);
-        text-shadow: 0 0 5px var(--color-text);
         box-shadow:  0 0 10px var(--color-accent);
-        
+        transform: scale(0.98);
     }
 }
 /* footer */
