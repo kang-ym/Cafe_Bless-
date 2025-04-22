@@ -64,7 +64,7 @@ header{
     justify-content: space-between;
     align-items: center;
     height: 80px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 .logo-container{
     position: relative;
@@ -91,30 +91,28 @@ header{
 }
 
 /* main */
-
-/* ticker anmation */
-.ticker-box{
-    overflow: hidden;
+.date-container{
+    display: flex;
+    justify-content: space-between;
+}
+.date-box{
+    display: inline-block;
+    border: 2px solid var(--color-accent);
+    border-radius: 8px;
+    padding: 5px;
     margin-bottom: 10px;
 }
-.ticker-box p{
-    white-space: nowrap;/* 한 줄 */
-    width: fit-content; /* 안 내용물 다 선택 */
-    background-color: var(--color-text);
-    color: #fff;
-    padding: 6px;
-    text-indent: 4em; /* 4글자 정도  이동*/
-    animation: ticker 12s infinite linear;
-    >span{
-        margin-left: 4em;
-    }
+.use-btn{
+    width: 3.7rem;
+    height: 1.7rem;
+    border: 1px solid transparent;
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px #3E272399;
 }
-
-@keyframes ticker{
-    0%{transform: translateX(0);}
-    100%{transform: translateX(-50%);}
-}
-
 /* order box */
 .order-box{
     width: 100%;
@@ -127,6 +125,7 @@ header{
 #orderResult{
     color: var(--color-bg);
     text-align: center;
+    line-height: 1.5;
 }
 
 
@@ -136,6 +135,8 @@ header{
 
 /* select box */
 .select-box{
+    padding: 0 15px;
+    padding-top: 15px;
     position: relative;
     display: grid;
     grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
@@ -322,6 +323,7 @@ footer{
         flex-wrap: nowrap;
         overflow: auto;
         scroll-snap-type: x mandatory;
+        scroll-padding: 20px;
     }
     .coffe-box{
         flex: 0 0 80%;

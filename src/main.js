@@ -8,6 +8,14 @@ const sizeRadios = document.querySelectorAll('.size-radio input');
 const nameInput = document.getElementById('customerName');
 const quantityInput = document.getElementById('coffeeQuantity');
 
+// ✅ 날짜 정보
+const today = new Date();
+const year = today.getFullYear();
+const month = String(today.getMonth() + 1).padStart(2,'0');
+const date = String(today.getDate()).padStart(2,'0');
+const getDate = `${year}-${month}-${date}`;
+document.getElementById('getdate').textContent = getDate;
+
 // ✅ 커피 선택 시 그림자 업데이트
 function updateCoffeeSelection() {
   coffeeRadios.forEach((radio, index) => {
@@ -58,11 +66,12 @@ function handleOrder() {
   const pricePerCup = parseInt(priceElement.dataset[`price${size.toLowerCase()}`], 10);
   const totalPrice = pricePerCup * quantity;
 
-  const summary = `注文者: ${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, 合計: ${totalPrice}円ご注文ありがとうございます。`;
+  const summary = `注文者: ${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, 合計: ${totalPrice}円 ご注文ありがとうございます。`;
   orderResult.textContent = summary;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const orderData = {
+    today: getDate,
     coffee: coffeeLabel,
     size,
     temperature: hotOrCold,
