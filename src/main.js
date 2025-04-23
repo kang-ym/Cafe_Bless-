@@ -1,3 +1,5 @@
+'use strict';
+
 // 👉 요소들 찾기
 const coffeeRadios = document.querySelectorAll('.coffe-box input[type="radio"]');
 const imgBoxes = document.querySelectorAll('.coffe-box .img-box');
