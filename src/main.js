@@ -42,6 +42,8 @@ function updateSizeSelection() {
 }
 
 // ✅ 주문 버튼 클릭 처리
+let isFirstOrder = true;
+
 function handleOrder() {
   const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
   const coffeeBox = selectedCoffee.closest('.coffe-box');
@@ -68,9 +70,19 @@ function handleOrder() {
   const pricePerCup = parseInt(priceElement.dataset[`price${size.toLowerCase()}`], 10);
   const totalPrice = pricePerCup * quantity;
 
-  const summary = `注文者: ${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, 合計: ${totalPrice}円 ご注文ありがとうございます。`;
-  orderResult.textContent = summary;
+  const summary = `注文者: ${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, 合計: ${totalPrice}円`;
+  // orderResult.textContent = summary;
+  // window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (isFirstOrder) {
+    orderResult.textContent = `\n- ${summary}`;
+    orderBtn.textContent = '注文追加';
+    isFirstOrder = false;
+  } else {
+    orderResult.textContent += `\n- ${summary}`;
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
 
   const orderData = {
     today: getDate,

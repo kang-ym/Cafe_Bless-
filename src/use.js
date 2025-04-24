@@ -9,5 +9,5 @@ closeBtn.addEventListener('click',()=>{
 });
 
 openBtn.addEventListener('click',()=>{
-    usePage.style.display = 'block';
+    usePage.style.display = 'flex';
 });
