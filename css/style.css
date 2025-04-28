@@ -64,13 +64,10 @@ body{
 /* use-container */
 .use-container{
     position: fixed;
-    top: 100px;
+    top: 1rem;
     left: 0;
     z-index: 100;
     width: 52%;
-    /* width: 100vw;
-    height: 100vh; */
-    /* background-color: #00000055; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -383,7 +380,7 @@ footer{
 
     .use-container{
         position: fixed;
-        top: 100px;
+        top: 0;
         left: 0;
         z-index: 100;
         width: 100vw;

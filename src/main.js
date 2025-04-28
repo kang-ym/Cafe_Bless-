@@ -46,6 +46,12 @@ let isFirstOrder = true;
 
 function handleOrder() {
   const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
+  if (!selectedCoffee) {
+    orderResult.textContent = 'メニューを選択してください。';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
   const coffeeBox = selectedCoffee.closest('.coffe-box');
   const coffeeLabel = coffeeBox.querySelector('h3')?.dataset.en;
 
@@ -71,14 +77,12 @@ function handleOrder() {
   const totalPrice = pricePerCup * quantity;
 
   const summary = `注文者: ${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, 合計: ${totalPrice}円`;
-  // orderResult.textContent = summary;
-  // window.scrollTo({ top: 0, behavior: 'smooth' });
   if (isFirstOrder) {
     orderResult.textContent = `\n- ${summary}`;
     orderBtn.textContent = '注文追加';
     isFirstOrder = false;
   } else {
-    orderResult.textContent += `\n- ${summary}`;
+    orderResult.innerHTML += `<br>- ${summary}`;
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -93,7 +97,11 @@ function handleOrder() {
     name,
     price: totalPrice
   };
-  localStorage.setItem('lastOrder', JSON.stringify(orderData));
+  
+  // ✅ 여러 주문 저장 (배열에)
+  const savedOrders = JSON.parse(localStorage.getItem('orders')) || [];
+  savedOrders.push(orderData);
+  localStorage.setItem('orders', JSON.stringify(savedOrders));
 }
 
 // ✅ 이벤트 연결
