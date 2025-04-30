@@ -125,15 +125,18 @@
             </div>
 
             <button class="order-btn">注文</button>
+            <!-- login -->
             <div class="login-container">
                 <div class="login-box">
                     <h3 class="login-h3">Login</h3>
                     <p class="name">Managers</p>
                     <div class="password-box">
                         <p>password</p>
-                        <input type="password" name="password" id="passwordInput" placeholder="パスワード入力して下さい。">
+                        <form action="login.php" method="POST">
+                            <input type="password" name="password" id="passwordInput" placeholder="パスワード入力して下さい。">
+                            <button id="loginBtn">Login</button>
+                        </form>
                     </div>
-                    <button id="loginBtn">Login</button>
                     <button class="login-close-btn">
                         <span></span>
                     </button>
