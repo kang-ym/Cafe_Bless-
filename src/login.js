@@ -9,20 +9,10 @@ const managerBtn = document.querySelector(".manager-btn");
 
 // 로그인 창 열기
 managerBtn.addEventListener("click", () => {
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
-
-  if (isLoggedIn === "true") {
-    // ✅ 로그아웃 처리
-    localStorage.removeItem("isLoggedIn");
-    alert("ログアウトしました。");
-    managerBtn.textContent = "Manager Login";
-    loginInput.value = "";
-    location.reload(); // 상태 반영을 위해 새로고침
-  } else {
     // ✅ 로그인 창 열기
     loginBox.style.display = "flex";
     loginInput.focus();
-  }
+    
 });
 
 // 로그인 창 닫기
@@ -39,18 +29,14 @@ loginBtn.addEventListener("click", (e) => {
   const correctPassword = "bless123"; // ✔️ 원하는 비밀번호로 설정하세요
 
   if (password === correctPassword) {
-    alert("로그인 성공!");
-    // 이동하려면 다음 줄 주석 해제
-    // window.location.href = 'manager.html';
+    window.location.href = "manager.html";
     localStorage.setItem("isLoggedIn", "true"); // 상태 저장
-    managerBtn.textContent = "Logout";
 
     loginBox.style.display = "none";
     loginInput.value = "";
   } else {
     alert("パスワードが間違っています。");
   }
-  console.log("로그인 됨");
 });
 
 // ✅ Enter 키로 로그인
@@ -67,6 +53,5 @@ window.addEventListener("DOMContentLoaded", () => {
   if (isLoggedIn === "true") {
     loginBox.style.display = "none";
     console.log("이미 로그인된 상태입니다.");
-    managerBtn.textContent = "Logout";
   }
 });
