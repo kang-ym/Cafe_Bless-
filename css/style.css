@@ -449,6 +449,37 @@ footer{
     height: 100px;
 }
 
+
+/* manager */
+.Manager .mobile-container{
+    width: 100%;
+    margin-right: 0;
+}
+
+/* nav */
+.nav-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    >li{
+        text-align: center;
+        >a{
+            background-color: var(--color-accent);
+            border-radius: 8px;
+            display: block;
+            color: var(--color-bg);
+            padding: 10px 40px;
+            transition: .3s;
+        }
+    }
+}
+.nav-box li:hover a{
+    background-color: #ff6565;
+}
+
+
+
 @media (width < 768px){
     .wrapper{
         display: none;
