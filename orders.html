@@ -1,0 +1,52 @@
+!<!DOCTYPE html>
+<html lang="jp">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Manager Page</title>
+        <!-- googlefont -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&family=M+PLUS+Rounded+1c&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <!-- fontawesome -->
+        <script src="https://kit.fontawesome.com/fcbf2015e7.js" crossorigin="anonymous"></script>
+        <!-- css -->
+        <link rel="stylesheet" href="./css/style.css">
+        <!-- Java script -->
+        <script type="module" src="./src/auth.js" defer></script>
+    </head>
+    <body class="Manager">
+    <div class="mobile-container">
+        <header class="manager-header">
+            <div class="logo-container">
+                <h1>Cafe Bless</h1>
+            </div>
+            <!-- /.logo-container -->
+            <a href="#" class="manager-btn">Manager Login</a>
+        </header>
+        <!-- header -->
+        <nav>
+            <ul class="nav-box">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#">Today's Orders</a></li>
+                <li><a href="#cafe-ledger">Cafe Ledger</a></li>
+                <li><a href="#luch-ledger">Lunch Ledger</a></li>
+            </ul>
+        </nav>
+        <!-- nav -->
+        <main class="orders">
+            <section class="order-box">
+                <h2>📅 今日の注文：<span id="orderDate"></span></h2>
+                <ul id="orderList"></ul>
+            </section>
+        </main>
+        <!-- main -->
+
+        <footer class="manager-footer">
+            <p><small>&copy; Cofe Bless all rights reserved.</small></p>
+        </footer>
+        <!-- footer -->
+    </div>
+
+</body>
+</html>
