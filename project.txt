@@ -228,7 +228,8 @@ Manager Site Navigation
 1. index.html (고객 주문)
 주문시 포인트 차감 계산은 서버에서 처리
 
-Vercel → Apps Script로 전송
+Vercel → Apps Script로 전송 실패!!!!!!
+firebase로 해보기
 
 2. orders.html (매니저 주문 확인)
 오늘 날짜 필터링
