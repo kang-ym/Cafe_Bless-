@@ -29,7 +29,7 @@ loginBtn.addEventListener("click", (e) => {
   const correctPassword = "bless123"; // ✔️ 원하는 비밀번호로 설정하세요
 
   if (password === correctPassword) {
-    window.location.href = "/home/";
+    window.location.href = "/Cafe_Bless-/home/";
     localStorage.setItem("isLoggedIn", "true"); // 상태 저장
 
     loginBox.style.display = "none";
