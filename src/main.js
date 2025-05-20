@@ -110,9 +110,12 @@ function sendToGoogleSheet(orderData) {
   const formData = new FormData();
   formData.append("data", JSON.stringify(orderData));
 
-  fetch("https://script.google.com/macros/s/AKfycbx5CUwHjrJDz6xUnNxgItonXlRQq0jyzccc1BQ7f2N2IzyAfqihG3A5r-RN_hlYQQr5/exec", {
+  fetch("https://YOUR-VERCEL-URL.vercel.app/api/submit-order", {
     method: "POST",
-    body: formData,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(orderData)
   })
   
   .then(res => res.text())
