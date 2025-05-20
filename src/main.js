@@ -88,6 +88,7 @@ function handleOrder() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const orderData = {
+    timestamp: new Date().toISOString(),
     today: getDate,
     coffee: coffeeLabel,
     size,
@@ -97,28 +98,16 @@ function handleOrder() {
     price: totalPrice
   };
 
-  // ✅ 여러 주문 저장 (배열에)
-  const savedOrders = JSON.parse(localStorage.getItem('orders')) || [];
-  savedOrders.push(orderData);
-  localStorage.setItem('orders', JSON.stringify(savedOrders));
-
-  // ✅ Google Sheets로 전송
-  sendToGoogleSheet(orderData);
+  // ✅ Firebase로 저장
+  saveOrderToFirebase(orderData);
 }
 
-function sendToGoogleSheet(orderData) {
-  const formData = new FormData();
-  formData.append("data", JSON.stringify(orderData));
-
-  fetch("https://script.google.com/macros/s/AKfycbx3IVLq5ZVF3zlUSyhGO4xn8aMSh0fam36GJbgEP5TszUE6x2pxABpfpogIK3SLSeDw/exec", {
-    method: "POST",
-    body: formData
-  })
-    .then(res => res.text())
-    .then(msg => console.log("✅ 주문 전송 성공:", msg))
-    .catch(err => console.error("❌ 주문 전송 실패:", err));
+function saveOrderToFirebase(orderData) {
+  const newRef = database.ref('orders').push();
+  newRef.set(orderData)
+    .then(() => console.log("✅ 주문 저장 완료"))
+    .catch(err => console.error("❌ 주문 저장 실패:", err));
 }
-
 
 // ✅ 이벤트 연결
 coffeeRadios.forEach(radio => {
