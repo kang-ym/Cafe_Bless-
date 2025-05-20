@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!<!DOCTYPE html>
 <html lang="jp">
     <head>
         <meta charset="UTF-8">
@@ -11,11 +11,11 @@
         <!-- fontawesome -->
         <script src="https://kit.fontawesome.com/fcbf2015e7.js" crossorigin="anonymous"></script>
         <!-- css -->
-        <link rel="stylesheet" href="./css/style.css">
+        <link rel="stylesheet" href="../css/style.css">
         <!-- Java script -->
-        <script type="module" src="./src/auth.js" defer></script>
+        <script type="module" src="../src/orders.js" defer></script>
     </head>
-    <body class="Manager" id="home">
+    <body class="Manager">
     <div class="mobile-container">
         <header class="manager-header">
             <div class="logo-container">
@@ -27,17 +27,18 @@
         <!-- header -->
         <nav>
             <ul class="nav-box">
-                <li><a href="#">Home</a></li>
-                <li><a href="#orders">Today's Orders</a></li>
-                <li><a href="#cafe-ledger">Cafe Ledger</a></li>
-                <li><a href="#luch-ledger">Lunch Ledger</a></li>
+                <li><a href="/home/">Home</a></li>
+                <li><a href="#">Today's Orders</a></li>
+                <li><a href="/cafe-ledger/">Cafe Ledger</a></li>
+                <li><a href="/lunch-ledger/">Lunch Ledger</a></li>
             </ul>
         </nav>
         <!-- nav -->
-        <main class="home">
-            <div class="home-img-box">
-                <img src="./img/manager.png" alt="">
-            </div>
+        <main class="orders">
+            <section class="order-box">
+                <h2>📅 今日の注文：<span id="orderDate"></span></h2>
+                <ul id="orderList"></ul>
+            </section>
         </main>
         <!-- main -->
 
