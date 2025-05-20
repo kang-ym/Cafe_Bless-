@@ -31,12 +31,12 @@ function fetchOrdersFromFirebase() {
 }
 
 function renderOrders(orders) {
-  const listContainer = document.getElementById('orders-list');
+  const listContainer = document.getElementById('orderList');
   if (!listContainer) return;
   listContainer.innerHTML = '';
 
   orders.forEach((order, index) => {
-    const item = document.createElement('div');
+    const item = document.createElement('li');
     item.className = 'order-item';
 
     const pointDisplay = order.point !== undefined ? `(${order.point}P)` : '';
