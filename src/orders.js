@@ -39,10 +39,11 @@ function sendToGoogleSheet(orderData) {
     const formData = new FormData();
     formData.append("data", JSON.stringify(orderData));
   
-    fetch("https://script.google.com/macros/s/AKfycbxMX5UCAq6IrdCCxyWCXlZSFRy6ACAKDsPmo1Xl1Dt-IhSudtVZuQVBL3SvD98b7NJ3/exec", {
-      method: "POST",
-      body: formData,
-    })
+    fetch("https://script.google.com/macros/s/AKfycbyMX5UCAq6IrdCCxyWCXlZSF...", {
+        method: "POST",
+        body: formData,
+      })
+      
     .then(res => res.text())
     .then(msg => console.log("✅ 주문 전송 성공:", msg))
     .catch(err => console.error("❌ 주문 전송 실패:", err));
