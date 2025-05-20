@@ -61,7 +61,7 @@ function handleOrder() {
   const name = nameInput.value.trim();
   if (!name) {
     orderResult.textContent = '注文者の名前を入力してください。';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
   const quantity = parseInt(quantityInput.value, 10);
@@ -87,7 +87,6 @@ function handleOrder() {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-
   const orderData = {
     today: getDate,
     coffee: coffeeLabel,
@@ -97,12 +96,29 @@ function handleOrder() {
     name,
     price: totalPrice
   };
-  
+
   // ✅ 여러 주문 저장 (배열에)
   const savedOrders = JSON.parse(localStorage.getItem('orders')) || [];
   savedOrders.push(orderData);
   localStorage.setItem('orders', JSON.stringify(savedOrders));
+
+  // ✅ Google Sheets로 전송
+  sendToGoogleSheet(orderData);
 }
+
+function sendToGoogleSheet(orderData) {
+  const formData = new FormData();
+  formData.append("data", JSON.stringify(orderData));
+
+  fetch("https://script.google.com/macros/s/AKfycbyFDlPLYuc4duF1oi12YMiyZblqE2rLQa7mJ14UAW_W5LnN5pBVAfBujfla2M89MbfH/exec", {
+    method: "POST",
+    body: formData,
+  })
+  .then(res => res.text())
+  .then(msg => console.log("✅ 주문 전송 성공:", msg))
+  .catch(err => console.error("❌ 주문 전송 실패:", err));
+}
+
 
 // ✅ 이벤트 연결
 coffeeRadios.forEach(radio => {
