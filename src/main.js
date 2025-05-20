@@ -107,21 +107,18 @@ function handleOrder() {
 }
 
 function sendToGoogleSheet(orderData) {
-  const formData = new FormData();
-  formData.append("data", JSON.stringify(orderData));
-
-  fetch("https://YOUR-VERCEL-URL.vercel.app/api/submit-order", {
+  fetch("https://cafe-bless.vercel.app/api/submit-order", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(orderData)
   })
-  
   .then(res => res.text())
   .then(msg => console.log("✅ 주문 전송 성공:", msg))
   .catch(err => console.error("❌ 주문 전송 실패:", err));
 }
+
 
 
 // ✅ 이벤트 연결
