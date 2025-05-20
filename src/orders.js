@@ -7,11 +7,13 @@ const month = String(today.getMonth() + 1).padStart(2, '0');
 const date = String(today.getDate()).padStart(2, '0');
 const getDate = `${year}-${month}-${date}`;
 
+// ✅ 화면 상단 날짜 표시
 const orderDate = document.getElementById('orderDate');
 if (orderDate) {
   orderDate.textContent = getDate;
 }
 
+// ✅ Firebase에서 오늘 날짜의 주문 불러오기
 function fetchOrdersFromFirebase() {
   const ordersRef = database.ref('orders');
   ordersRef.once('value')
@@ -30,6 +32,7 @@ function fetchOrdersFromFirebase() {
     });
 }
 
+// ✅ 주문 목록 화면에 렌더링
 function renderOrders(orders) {
   const listContainer = document.getElementById('orderList');
   if (!listContainer) return;
@@ -52,12 +55,18 @@ function renderOrders(orders) {
     listContainer.appendChild(item);
   });
 
+  // ✅ 완료 체크 처리
   document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', e => {
-      if (e.target.checked) e.target.parentElement.parentElement.classList.add('checked');
-      else e.target.parentElement.parentElement.classList.remove('checked');
+      const parent = e.target.closest('.order-item');
+      if (e.target.checked) {
+        parent.classList.add('checked');
+      } else {
+        parent.classList.remove('checked');
+      }
     });
   });
 }
 
+// ✅ 실행
 fetchOrdersFromFirebase();
