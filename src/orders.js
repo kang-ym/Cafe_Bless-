@@ -1,51 +1,55 @@
-"use strict";
-
-// orders.js
 'use strict';
 
-// 📅 오늘 날짜 표시
+// 오늘 날짜 표시
 const today = new Date();
-const orderDate = document.getElementById('orderDate');
-orderDate.textContent = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+const year = today.getFullYear();
+const month = String(today.getMonth() + 1).padStart(2,'0');
+const date = String(today.getDate()).padStart(2,'0');
+const getDate = `${year}-${month}-${date}`;
+document.getElementById('getdate').textContent = getDate;
 
-// 📦 주문 데이터 예시
-const orders = [
-  { coffee: 'アメリカーノ', temp: 'ホット', size: 'R', name: '강영민', point: 250 },
-  { coffee: 'カフェラテ', temp: 'アイス', size: 'L', name: '강영민', point: 180 },
-  { coffee: 'バニララテ', temp: 'ホット', size: 'R', name: '하윤맘', point: -50 }
-];
+// 주문 리스트 렌더링
+function renderOrders() {
+  const listContainer = document.getElementById('orders-list');
+  listContainer.innerHTML = '';
+  const orders = JSON.parse(localStorage.getItem('orders')) || [];
 
-// 📋 주문 렌더링
-const orderList = document.getElementById('orderList');
-orders.forEach(order => {
-  const li = document.createElement('li');
-  li.classList.add('order-item');
+  orders.forEach((order, index) => {
+    const item = document.createElement('div');
+    item.className = 'order-item';
 
-  const isLow = order.point <= 200;
-  const warning = isLow ? '!!' : '';
-  const pointDisplay = isLow ? `<span style="color:red;">(${order.point}円)</span>` : `(${order.point}円)`;
+    const needCharge = order.point !== undefined && order.point <= 200;
+    const pointDisplay = order.point !== undefined ? `(${order.point}P)` : '';
+    const warning = needCharge ? '‼️' : '';
 
-  li.innerHTML = `
-    <div><strong>${warning} ${order.coffee}</strong> ${order.temp} ${order.size} ${order.name}${warning} ${pointDisplay}</div>
-    <label><input type="checkbox"> 完了</label>
-  `;
+    item.innerHTML = `
+      <p>${order.today} / ${order.coffee} / ${order.temperature} / ${order.size} / ${order.name}${warning} ${pointDisplay}</p>
+      <label>
+        <input type="checkbox" data-index="${index}"> 완료
+      </label>
+    `;
 
-  orderList.appendChild(li);
-  sendToGoogleSheet(order);
-});
+    listContainer.appendChild(item);
+  });
 
-// ✅ Google Sheets로 전송
-function sendToGoogleSheet(orderData) {
-    const formData = new FormData();
-    formData.append("data", JSON.stringify(orderData));
-  
-    fetch("https://script.google.com/macros/s/AKfycbx5CUwHjrJDz6xUnNxgItonXlRQq0jyzccc1BQ7f2N2IzyAfqihG3A5r-RN_hlYQQr5/exec", {
-        method: "POST",
-        body: formData,
-      })
-      
-    .then(res => res.text())
-    .then(msg => console.log("✅ 주문 전송 성공:", msg))
-    .catch(err => console.error("❌ 주문 전송 실패:", err));
-  }
-  
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', e => {
+      if (e.target.checked) e.target.parentElement.parentElement.classList.add('checked');
+      else e.target.parentElement.parentElement.classList.remove('checked');
+    });
+  });
+}
+
+// Google Sheets에서 주문 불러오기
+function fetchOrdersFromSheet() {
+  fetch('https://script.google.com/macros/s/AKfycbx5CUwHjrJDz6xUnNxgItonXlRQq0jyzccc1BQ7f2N2IzyAfqihG3A5r-RN_hlYQQr5/exec')
+    .then(res => res.json())
+    .then(data => {
+      const todayOrders = data.filter(order => order.today === getDate);
+      localStorage.setItem('orders', JSON.stringify(todayOrders));
+      renderOrders();
+    })
+    .catch(err => console.error('❌ 주문 불러오기 실패:', err));
+}
+
+fetchOrdersFromSheet();
