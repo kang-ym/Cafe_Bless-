@@ -42,7 +42,7 @@ function renderOrders() {
 
 // Google Sheets에서 주문 불러오기
 function fetchOrdersFromSheet() {
-  fetch('https://script.google.com/macros/s/AKfycbx5CUwHjrJDz6xUnNxgItonXlRQq0jyzccc1BQ7f2N2IzyAfqihG3A5r-RN_hlYQQr5/exec')
+  fetch('https://script.google.com/macros/s/AKfycbx7ufaQmDEtkX-eoFxWYYjT47AEvYI1ezfIcJORtB9QknRQI_Ilk_zmPBoT1LF9EcpM/exec')
     .then(res => res.json())
     .then(data => {
       const todayOrders = data.filter(order => order.today === getDate);

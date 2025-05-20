@@ -110,7 +110,7 @@ function sendToGoogleSheet(orderData) {
   const formData = new FormData();
   formData.append("data", JSON.stringify(orderData));
 
-  fetch("https://script.google.com/macros/s/AKfycbx5CUwHjrJDz6xUnNxgItonXlRQq0jyzccc1BQ7f2N2IzyAfqihG3A5r-RN_hlYQQr5/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbx7ufaQmDEtkX-eoFxWYYjT47AEvYI1ezfIcJORtB9QknRQI_Ilk_zmPBoT1LF9EcpM/exec", {
     method: "POST",
     body: formData
   })
