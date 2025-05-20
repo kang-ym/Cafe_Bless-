@@ -6,7 +6,7 @@ const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2,'0');
 const date = String(today.getDate()).padStart(2,'0');
 const getDate = `${year}-${month}-${date}`;
-document.getElementById('getdate').textContent = getDate;
+document.getElementById('orderDate').textContent = getDate;
 
 // 주문 리스트 렌더링
 function renderOrders() {
@@ -42,7 +42,7 @@ function renderOrders() {
 
 // Google Sheets에서 주문 불러오기
 function fetchOrdersFromSheet() {
-  fetch('https://script.google.com/macros/s/AKfycbwUkJcMfGejsmL7YPS9K-BcIRg4KTr38jAhqBTBasvTyCI9DQctysqkYsXC6aQ-gh_Y/exec')
+  fetch('https://script.google.com/macros/s/AKfycbz-jMXeYyS18RymTtgp3Pq94RI1lfFkNuHpnDL3bEOrFhZbfEa73Sctoz-bDgCO0TtU/exec')
     .then(res => res.json())
     .then(data => {
       const todayOrders = data.filter(order => order.today === getDate);
