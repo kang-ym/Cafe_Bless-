@@ -5,7 +5,7 @@ const isLoggedIn = localStorage.getItem("isLoggedIn");
 
 if (isLoggedIn !== "true") {
     // 로그인 안 했으면 index.html로 이동
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
 
 // ✅ 버튼 텍스트 변경
@@ -16,7 +16,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
         managerBtn.addEventListener('click', ()=>{
             localStorage.removeItem('isLoggedIn');
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         });
     }
 });
