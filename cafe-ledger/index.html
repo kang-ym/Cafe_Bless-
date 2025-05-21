@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="jp">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Manager Page</title>
+        <!-- googlefont -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&family=M+PLUS+Rounded+1c&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <!-- fontawesome -->
+        <script src="https://kit.fontawesome.com/fcbf2015e7.js" crossorigin="anonymous"></script>
+        <!-- Firebase App (필수) -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+        <!-- Firebase Database -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+        <!-- 공통 초기화 -->
+        <script src="../src/firebase-init.js"></script>
+
+        <!-- css -->
+        <link rel="stylesheet" href="../css/style.css">
+        <!-- Java script -->
+        <script src="../src/cafe-ledger.js" defer></script>
+    </head>
+
+<body class="manager">
+    <div class="mobile-container">
+    <header class="manager-header">
+        <div class="logo-container">
+            <h1>Cafe Bless</h1>
+        </div>
+        <a href="#" class="manager-btn">Manager Login</a>
+    </header>
+
+    <nav>
+        <ul class="nav-box">
+            <li><a href="/home/">Home</a></li>
+            <li><a href="/orders/">Today's Orders</a></li>
+            <li><a href="#">Cafe Ledger</a></li>
+            <li><a href="/lunch-ledger/">Lunch Ledger</a></li>
+        </ul>
+    </nav>
+
+    <main class="ledger-main">
+        <section class="ledger-section">
+          <h2>💰 カフェガ計簿｜Cafe Ledger</h2>
+          <select id="ledger-select-group">
+            <option value="希望">希望（희망）</option>
+            <option value="信仰">信仰（신앙）</option>
+            <option value="愛">愛（사랑）</option>
+          </select>
+          <button id="ledger-btn-add-person">＋ 사람 추가</button>
+      
+          <div class="ledger-table-container">
+            <table class="ledger-table">
+              <thead>
+                <tr>
+                  <th>이름</th>
+                  <th>현재 금액</th>
+                  <th>충전</th>
+                  <th>2025.6.21</th>
+                  <th>2025.6.28</th>
+                </tr>
+              </thead>
+              <tbody id="ledger-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+      
+
+    <footer class="manager-footer">
+        <p><small>&copy; Cofe Bless all rights reserved.</small></p>
+    </footer>
+    </div>
+
+    <script src="../src/cafe-ledger.js"></script>
+  </body>
+</html>
