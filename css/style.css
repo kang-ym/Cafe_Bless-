@@ -298,7 +298,27 @@ h3{
 .customer-name{
     width: 50%;
     text-align: center;
+
 }
+
+.name-box{
+    /* border: 1px solid #000; */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+}
+#group{
+    text-align: center;
+    width: 50%;
+}
+#customerName{
+    width: 100%;
+    text-align: center;
+    
+}
+
 .coffee-quantity{
     width: 50%;
     text-align: center;
