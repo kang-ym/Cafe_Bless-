@@ -1,85 +1,83 @@
 'use strict';
 
-// cafe-ledger.js (auto column for date records)
+// cafe-ledger.js (Firebase 연동 포함)
 
 const ledgerGroupSelect = document.getElementById('ledger-select-group');
 const ledgerTableBody = document.getElementById('ledger-table-body');
 const ledgerTableHead = document.querySelector('.ledger-table thead tr');
-
-const ledgerData = {
-  "希望": [
-    { name: "강영민", balance: 800, records: {} },
-    { name: "강민", balance: 150, records: {} }
-  ],
-  "信仰": [],
-  "愛": []
-};
 
 function getTodayKey() {
   const today = new Date();
   return `${today.getFullYear()}.${today.getMonth() + 1}.${today.getDate()}`;
 }
 
-function collectAllDates(group) {
-  const dateSet = new Set();
-  group.forEach(p => {
-    Object.keys(p.records).forEach(date => dateSet.add(date));
-  });
-  return Array.from(dateSet).sort();
-}
-
 function formatRecordEntries(entries = []) {
   return entries.map(e => `${e > 0 ? '+' : ''}${e}엔`).join('<br>');
 }
 
+function collectAllDates(groupData) {
+  const dateSet = new Set();
+  for (const personName in groupData) {
+    const person = groupData[personName];
+    if (person.records) {
+      Object.keys(person.records).forEach(date => dateSet.add(date));
+    }
+  }
+  return Array.from(dateSet).sort();
+}
+
 function renderLedger(groupName) {
-  const group = ledgerData[groupName] || [];
-  const allDates = collectAllDates(group);
+  const groupRef = database.ref(`ledger/${groupName}`);
+  groupRef.once('value').then(snapshot => {
+    const groupData = snapshot.val() || {};
+    const allDates = collectAllDates(groupData);
 
-  // 헤더 재구성
-  ledgerTableHead.innerHTML = `
-    <th>이름</th>
-    <th>현재 금액</th>
-    <th>충전</th>
-    ${allDates.map(date => `<th>${date}</th>`).join('')}
-  `;
-
-  ledgerTableBody.innerHTML = '';
-  group.forEach(person => {
-    const row = document.createElement('tr');
-    const balanceClass = person.balance <= 200 ? 'ledger-balance-low' : '';
-    let rowHtml = `
-      <td>${person.name}</td>
-      <td class="ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}엔</td>
-      <td><button class="ledger-btn-charge">충전</button></td>
+    ledgerTableHead.innerHTML = `
+      <th>이름</th>
+      <th>현재 금액</th>
+      <th>충전</th>
+      ${allDates.map(date => `<th>${date}</th>`).join('')}
     `;
+    ledgerTableBody.innerHTML = '';
 
-    allDates.forEach(date => {
-      const entries = person.records[date] || [];
-      rowHtml += `<td>${formatRecordEntries(entries) || '-'}</td>`;
-    });
+    for (const personName in groupData) {
+      const person = groupData[personName];
+      const balanceClass = person.balance <= 200 ? 'ledger-balance-low' : '';
+      let rowHtml = `
+        <td>${personName}</td>
+        <td class="ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}엔</td>
+        <td><button class="ledger-btn-charge" data-name="${personName}">충전</button></td>
+      `;
 
-    row.innerHTML = rowHtml;
-    ledgerTableBody.appendChild(row);
+      allDates.forEach(date => {
+        const entries = person.records?.[date] || [];
+        rowHtml += `<td>${formatRecordEntries(entries) || '-'}</td>`;
+      });
 
-    const chargeBtn = row.querySelector('.ledger-btn-charge');
-    chargeBtn.addEventListener('click', () => {
-      const balanceCell = row.querySelector('[data-balance]');
-      let current = parseInt(balanceCell.dataset.balance);
-      const add = parseInt(prompt(`${person.name}님에게 충전할 금액을 입력하세요`, '500'));
-      if (!isNaN(add)) {
-        const newBalance = current + add;
-        balanceCell.textContent = `${newBalance}엔`;
-        balanceCell.dataset.balance = newBalance;
-        if (newBalance > 200) balanceCell.classList.remove('ledger-balance-low');
+      const row = document.createElement('tr');
+      row.innerHTML = rowHtml;
+      ledgerTableBody.appendChild(row);
 
-        const todayKey = getTodayKey();
-        if (!person.records[todayKey]) person.records[todayKey] = [];
-        person.records[todayKey].push(add);
+      const chargeBtn = row.querySelector('.ledger-btn-charge');
+      chargeBtn.addEventListener('click', () => {
+        const add = parseInt(prompt(`${personName}님에게 충전할 금액을 입력하세요`, '500'));
+        if (!isNaN(add)) {
+          const newBalance = person.balance + add;
+          const todayKey = getTodayKey();
 
-        renderLedger(groupName);
-      }
-    });
+          // 업데이트
+          person.balance = newBalance;
+          if (!person.records) person.records = {};
+          if (!person.records[todayKey]) person.records[todayKey] = [];
+          person.records[todayKey].push(add);
+
+          // 저장
+          groupRef.child(personName).set(person)
+            .then(() => renderLedger(groupName))
+            .catch(err => alert('❌ 저장 실패: ' + err));
+        }
+      });
+    }
   });
 }
 
@@ -95,8 +93,11 @@ document.getElementById('ledger-btn-add-person').addEventListener('click', () =>
   if (!name) return;
   const balance = parseInt(prompt('초기 금액을 입력하세요', '0')) || 0;
 
-  ledgerData[group].push({ name, balance, records: {} });
-  renderLedger(group);
+  const newPerson = { balance, records: {} };
+  const personRef = database.ref(`ledger/${group}/${name}`);
+  personRef.set(newPerson)
+    .then(() => renderLedger(group))
+    .catch(err => alert('❌ 저장 실패: ' + err));
 });
 
 renderLedger(ledgerGroupSelect.value);
