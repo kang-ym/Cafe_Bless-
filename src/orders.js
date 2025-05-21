@@ -46,7 +46,7 @@ function renderOrders(orders) {
     const warning = order.point !== undefined && order.point <= 200 ? '‼️' : '';
 
     item.innerHTML = `
-      <p>${order.today} / ${order.coffee} / ${order.temperature} / ${order.size} / ${order.name}${warning} ${pointDisplay}</p>
+      <p>${order.coffee} / ${order.temperature} / ${order.size} / ${order.name}${warning} ${pointDisplay}</p>
       <label>
         <input type="checkbox" data-index="${index}"> 완료
       </label>
