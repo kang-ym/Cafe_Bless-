@@ -13,7 +13,7 @@ if (orderDate) {
   orderDate.textContent = getDate;
 }
 
-// ✅ Firebase에서 오늘 날짜의 주문 불러오기
+// ✅ 주문 데이터 불러오기
 function fetchOrdersFromFirebase() {
   const ordersRef = database.ref('orders');
   ordersRef.once('value')
@@ -23,7 +23,6 @@ function fetchOrdersFromFirebase() {
         console.log("📭 주문 없음");
         return;
       }
-
       const orders = Object.values(data).filter(order => order.today === getDate);
       renderOrders(orders);
     })
@@ -32,7 +31,7 @@ function fetchOrdersFromFirebase() {
     });
 }
 
-// ✅ 주문 목록 화면에 렌더링
+// ✅ 주문 목록 출력 (잔액도 함께)
 function renderOrders(orders) {
   const listContainer = document.getElementById('orderList');
   if (!listContainer) return;
@@ -42,17 +41,26 @@ function renderOrders(orders) {
     const item = document.createElement('li');
     item.className = 'order-item';
 
-    const pointDisplay = order.point !== undefined ? `(${order.point}P)` : '';
-    const warning = order.point !== undefined && order.point <= 200 ? '‼️' : '';
+    const name = order.name;
+    const group = order.group;
 
-    item.innerHTML = `
-      <p>${order.coffee} / ${order.temperature} / ${order.size} / ${order.name}${warning} ${pointDisplay}</p>
-      <label>
-        <input type="checkbox" data-index="${index}"> 완료
-      </label>
-    `;
+    if (!name || !group) return; // 이름과 그룹 필수
 
-    listContainer.appendChild(item);
+    const ledgerRef = database.ref(`ledger/${group}/${name}/balance`);
+    ledgerRef.once('value').then(snapshot => {
+      const balance = snapshot.val();
+      const warning = balance !== null && balance <= 200 ? '‼️' : '';
+      const pointDisplay = balance !== null ? `(${balance}P)` : '';
+
+      item.innerHTML = `
+        <p>${order.coffee} / ${order.temperature} / ${order.size} / ${name} ${warning} ${pointDisplay}</p>
+        <label>
+          <input type="checkbox" data-index="${index}"> 完了
+        </label>
+      `;
+
+      listContainer.appendChild(item);
+    });
   });
 
   // ✅ 완료 체크 처리
