@@ -119,8 +119,20 @@
                     </div>
                     <div class="customer-name input-box">
                         <label>注文者:</label>
-                        <input type="text" id="customerName" placeholder="Name">
+                    
+                        <!-- 소속 선택 -->
+                        <select id="group">
+                            <option value="">チーム</option>
+                            <option value="trust">信仰</option>
+                            <option value="desire">希望</option>
+                            <option value="love">愛</option>
+                            <option value="guest">ゲスト</option>
+                        </select>
+                    
+                        <!-- 이름 공간 (선택 or 입력 둘 중 하나가 들어감) -->
+                        <div id="nameBox" style="margin-top: 5px;"></div>
                     </div>
+                    
                     <div class="coffee-quantity input-box">
                         <label>注文数:</label>
                         <input type="number" id="coffeeQuantity" min="1" value="1">    

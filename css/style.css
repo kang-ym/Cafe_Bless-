@@ -298,24 +298,13 @@ h3{
 .customer-name{
     width: 50%;
     text-align: center;
-    >label{
-        padding-right: 10px;
-    }
-    >input{
-        text-align: center;
-        height: 25px;
-    }
 }
 .coffee-quantity{
     width: 50%;
     text-align: center;
-    >label{
-        padding-right: 10px;
-    }
     >input{
         text-align: center;
         width: 50px;
-        height: 25px;
 
     }
 }
