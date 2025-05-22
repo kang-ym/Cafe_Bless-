@@ -521,6 +521,38 @@ h3{
 
 /* cafe-ledger */
 
+/* ✅ 탭 메뉴 스타일 */
+.cafe-ledger-tab {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .cafe-ledger-tab a {
+    padding: 6px 14px;
+    background-color: #e3f2fd;
+    color: #333;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  
+  .cafe-ledger-tab a:hover {
+    background-color: #bbdefb;
+  }
+  
+  .cafe-ledger-tab a.active {
+    background-color: #2196f3;
+    color: white;
+  }
+  
+  /* ✅ 테이블 행 구분 강조 */
+  .cafe-ledger-row:nth-child(even) {
+    background-color: #fafafa;
+  }
+  
+
 .ledger-table {
     width: 100%;
     border-collapse: collapse;
