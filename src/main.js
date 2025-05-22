@@ -11,13 +11,13 @@ const quantityInput = document.getElementById('coffeeQuantity');
 const groupSelect = document.getElementById('group');
 const nameBox = document.getElementById('nameBox');
 
-// ✅ 오늘 날짜 설정 (통일된 형식으로 두 자리 + _ 저장용 / . 표시용)
+// ✅ 오늘 날짜 설정 (Firebase-safe + 사용자 표시)
 const today = new Date();
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, '0');
 const date = String(today.getDate()).padStart(2, '0');
-const firebaseDate = `${year}_${month}_${date}`; // 저장용
-const displayDate = `${year}.${month}.${date}`;   // 사용자용
+const firebaseDate = `${year}_${month}_${date}`;
+const displayDate = `${year}.${month}.${date}`;
 
 document.getElementById('getdate').textContent = displayDate;
 
@@ -53,6 +53,7 @@ function handleOrder() {
 
   const coffeeBox = selectedCoffee.closest('.coffe-box');
   const coffeeLabel = coffeeBox.querySelector('h3')?.dataset.en;
+  const coffeeLabelJp = coffeeBox.querySelector('h3')?.textContent.trim(); // ✅ 일본어 이름
   const hotOrCold = document.querySelector('.hot-radio input:checked')?.value;
   const size = document.querySelector('.size-radio input:checked')?.value.toUpperCase();
   const name = getCustomerName();
@@ -86,9 +87,10 @@ function handleOrder() {
 
   const orderData = {
     timestamp: new Date().toISOString(),
-    today: firebaseDate, // 저장용 (ex: 2025_05_22)
-    displayDate: displayDate, // 사용자 표시용 (ex: 2025.05.22)
+    today: firebaseDate,
+    displayDate: displayDate,
     coffee: coffeeLabel,
+    coffeeJp: coffeeLabelJp, // ✅ 일본어 이름 저장
     size,
     temperature: hotOrCold,
     quantity,
