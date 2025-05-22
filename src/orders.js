@@ -1,8 +1,7 @@
-// orders.js - 커피 이름 일본어 표시 + 그룹 정보 추가 + 정렬
+// orders.js - 주문 정보 오른쪽에 完了 버튼 위치 조정
 
 'use strict';
 
-// ✅ 오늘 날짜 생성 (displayDate 형식)
 const today = new Date();
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -13,13 +12,11 @@ const orderList = document.getElementById('orderList');
 const orderDateTitle = document.getElementById('orderDate');
 orderDateTitle.textContent = todayDisplay;
 
-// ✅ Firebase에서 orders 데이터 로드
 const ordersRef = database.ref('orders');
 ordersRef.once('value').then(snapshot => {
   const data = snapshot.val();
   if (!data) return;
 
-  // ✅ 오늘 날짜 기준 필터 + 커피 이름 기준 정렬
   const orders = Object.entries(data)
     .filter(([_, order]) => order.displayDate === todayDisplay)
     .sort((a, b) => {
@@ -28,7 +25,6 @@ ordersRef.once('value').then(snapshot => {
       return aName.localeCompare(bName);
     });
 
-  // ✅ 주문 목록 렌더링
   orders.forEach(([id, order]) => {
     const div = document.createElement('div');
     div.className = 'order-item';
@@ -36,8 +32,10 @@ ordersRef.once('value').then(snapshot => {
     const coffeeName = order.coffeeJp || order.coffee;
 
     div.innerHTML = `
-      <p>${coffeeName} / ${hotOrCold} / ${order.size} / ${order.group} / ${order.name} (${order.price}P)</p>
-      <label><input type="checkbox"> 完了</label>
+      <p class="order-line">
+        <span>${coffeeName} / ${hotOrCold} / ${order.size} / ${order.group} / ${order.name} (${order.price}P)</span>
+        <label><input type="checkbox"> 完了</label>
+      </p>
     `;
     orderList.appendChild(div);
   });
