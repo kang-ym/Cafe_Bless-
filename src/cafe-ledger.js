@@ -1,7 +1,6 @@
-// cafe-ledger.js (게스트 이동 후 선택한 그룹도 렌더링)
+// cafe-ledger.js - 탭 클릭 시 active 전환 및 정확한 소속 렌더링
 
 const ledgerTableBody = document.getElementById('ledger-table-body');
-const ledgerGroupSelect = document.getElementById('ledger-select-group');
 const addPersonBtn = document.getElementById('ledger-btn-add-person');
 
 function getTodayKey() {
@@ -39,12 +38,12 @@ function renderLedger(groupName) {
 
     const ledgerTableHead = document.getElementById('ledger-table-head-row');
     ledgerTableHead.innerHTML = `
-      ${groupName === 'guest' ? '<th>소속</th>' : ''}
-      <th>이름</th>
-      <th>현재 금액</th>
-      <th>충전</th>
-      ${allDates.map(date => `<th>${formatDisplayDate(date)}</th>`).join('')}
-      ${groupName === 'guest' ? '<th>이동</th>' : ''}
+      ${groupName === 'guest' ? '<th class="cafe-ledger-col">소속</th>' : ''}
+      <th class="cafe-ledger-col">이름</th>
+      <th class="cafe-ledger-col">현재 금액</th>
+      <th class="cafe-ledger-col">충전</th>
+      ${allDates.map(date => `<th class="cafe-ledger-date">${formatDisplayDate(date)}</th>`).join('')}
+      ${groupName === 'guest' ? '<th class="cafe-ledger-col">이동</th>' : ''}
     `;
 
     ledgerTableBody.innerHTML = '';
@@ -53,35 +52,36 @@ function renderLedger(groupName) {
       const person = groupData[personName];
       const balanceClass = person.balance <= 200 ? 'ledger-balance-low' : '';
       const row = document.createElement('tr');
+      row.className = 'cafe-ledger-row';
 
       let rowHtml = '';
 
       if (groupName === 'guest') {
-        rowHtml += `<td>ゲスト</td>`;
-        rowHtml += `<td><input type="text" class="edit-name" value="${personName}" data-old="${personName}"></td>`;
+        rowHtml += `<td class="cafe-ledger-col">ゲスト</td>`;
+        rowHtml += `<td class="cafe-ledger-col"><input type="text" class="edit-name" value="${personName}" data-old="${personName}"></td>`;
       } else {
-        rowHtml += `<td>${personName}</td>`;
+        rowHtml += `<td class="cafe-ledger-col">${personName}</td>`;
       }
 
       rowHtml += `
         <td class="ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}엔</td>
-        <td><button class="ledger-btn-charge" data-name="${personName}">충전</button></td>
+        <td><button class="ledger-btn-charge cafe-ledger-btn" data-name="${personName}">충전</button></td>
       `;
 
       allDates.forEach(date => {
         const entries = person.records?.[date] || [];
-        rowHtml += `<td>${formatRecordEntries(entries) || '-'}</td>`;
+        rowHtml += `<td class="cafe-ledger-cell">${formatRecordEntries(entries) || '-'}</td>`;
       });
 
       if (groupName === 'guest') {
         rowHtml += `
-          <td>
+          <td class="cafe-ledger-col">
             <select class="move-group">
               <option value="信仰">信仰</option>
               <option value="希望">希望</option>
               <option value="愛">愛</option>
             </select>
-            <button class="move-btn" data-name="${personName}">이동</button>
+            <button class="move-btn cafe-ledger-btn" data-name="${personName}">이동</button>
           </td>
         `;
       }
@@ -148,7 +148,6 @@ function renderLedger(groupName) {
             ref.child(newGroup).child(personName).set(data);
             ref.child('guest').child(personName).remove();
 
-            // ✅ 이동한 그룹까지 반영되도록 추가 렌더링
             renderLedger('guest');
             renderLedger(newGroup);
           });
@@ -158,15 +157,21 @@ function renderLedger(groupName) {
   });
 }
 
-ledgerGroupSelect.addEventListener('change', () => {
-  const group = ledgerGroupSelect.value;
-  if (group) renderLedger(group);
+// ✅ 탭 클릭 시 active 클래스 갱신 + 그룹 렌더링
+const cafeLedgerTabs = document.querySelectorAll('.cafe-ledger-tab a');
+cafeLedgerTabs.forEach(tab => {
+  tab.addEventListener('click', e => {
+    e.preventDefault();
+    cafeLedgerTabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const group = tab.dataset.group;
+    renderLedger(group);
+  });
 });
 
 addPersonBtn.addEventListener('click', () => {
-  const group = ledgerGroupSelect.value;
-  if (!group) return alert('소속을 먼저 선택하세요.');
-
+  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
+  const group = activeTab?.dataset.group || 'trust';
   const name = prompt('추가할 사람 이름을 입력하세요');
   if (!name) return;
   const balance = parseInt(prompt('초기 금액을 입력하세요', '0')) || 0;
@@ -186,6 +191,7 @@ addPersonBtn.addEventListener('click', () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-  const group = ledgerGroupSelect.value;
-  if (group) renderLedger(group);
+  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
+  const group = activeTab?.dataset.group || 'trust';
+  renderLedger(group);
 });

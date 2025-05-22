@@ -46,13 +46,13 @@
     <main class="ledger-main">
         <section class="ledger-section">
           <h2>💰 カフェガ計簿｜Cafe Ledger</h2>
-          <select id="ledger-select-group">
-            <option value="希望">希望（희망）</option>
-            <option value="信仰">信仰（신앙）</option>
-            <option value="愛">愛（사랑）</option>
-            <option value="guest">ゲスト</option> 
-          </select>
-          <button id="ledger-btn-add-person">＋ 사람 추가</button>
+          <div class="cafe-ledger-tab">
+            <a href="#" data-group="信仰" class="active">信仰</a>
+            <a href="#" data-group="希望">希望</a>
+            <a href="#" data-group="愛">愛</a>
+            <a href="#" data-group="guest">ゲスト</a>
+            <button id="ledger-btn-add-person">＋ 사람 추가</button>
+          </div>          
       
           <div class="ledger-table-container">
             <table class="ledger-table">
