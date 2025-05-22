@@ -1,14 +1,20 @@
 'use strict';
+// cafe-ledger.js (날짜 키는 _로 저장, 표시용은 .로 변환)
 
-// cafe-ledger.js (Firebase 연동 포함)
-
-const ledgerGroupSelect = document.getElementById('ledger-select-group');
 const ledgerTableBody = document.getElementById('ledger-table-body');
-const ledgerTableHead = document.querySelector('.ledger-table thead tr');
+const ledgerGroupSelect = document.getElementById('ledger-select-group');
+const addPersonBtn = document.getElementById('ledger-btn-add-person');
 
 function getTodayKey() {
   const today = new Date();
-  return `${today.getFullYear()}.${today.getMonth() + 1}.${today.getDate()}`;
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const date = String(today.getDate()).padStart(2, '0'); 
+  return `${year}_${month}_${date}`; // ✅ Firebase-safe 날짜 키
+}
+
+function formatDisplayDate(dateKey) {
+  return dateKey.replace(/_/g, '.'); // ✅ 사용자 표시용으로 .로 변환
 }
 
 function formatRecordEntries(entries = []) {
@@ -32,17 +38,20 @@ function renderLedger(groupName) {
     const groupData = snapshot.val() || {};
     const allDates = collectAllDates(groupData);
 
+    const ledgerTableHead = document.getElementById('ledger-table-head-row');
     ledgerTableHead.innerHTML = `
       <th>이름</th>
       <th>현재 금액</th>
       <th>충전</th>
-      ${allDates.map(date => `<th>${date}</th>`).join('')}
+      ${allDates.map(date => `<th>${formatDisplayDate(date)}</th>`).join('')}
     `;
+
     ledgerTableBody.innerHTML = '';
 
     for (const personName in groupData) {
       const person = groupData[personName];
       const balanceClass = person.balance <= 200 ? 'ledger-balance-low' : '';
+
       let rowHtml = `
         <td>${personName}</td>
         <td class="ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}엔</td>
@@ -60,32 +69,42 @@ function renderLedger(groupName) {
 
       const chargeBtn = row.querySelector('.ledger-btn-charge');
       chargeBtn.addEventListener('click', () => {
-        const add = parseInt(prompt(`${personName}님에게 충전할 금액을 입력하세요`, '500'));
-        if (!isNaN(add)) {
-          const newBalance = person.balance + add;
+        const amount = parseInt(prompt(`${personName}님에게 충전할 금액을 입력하세요`, '1000'));
+        if (!isNaN(amount)) {
           const todayKey = getTodayKey();
+          const personRef = database.ref(`ledger/${groupName}/${personName}`);
 
-          // 업데이트
-          person.balance = newBalance;
-          if (!person.records) person.records = {};
-          if (!person.records[todayKey]) person.records[todayKey] = [];
-          person.records[todayKey].push(add);
+          personRef.once('value').then(snapshot => {
+            const personData = snapshot.val() || {};
+            const currentBalance = personData.balance || 0;
+            const newBalance = currentBalance + amount;
 
-          // 저장
-          groupRef.child(personName).set(person)
-            .then(() => renderLedger(groupName))
-            .catch(err => alert('❌ 저장 실패: ' + err));
+            const updatedRecords = personData.records || {};
+            const todayList = Array.isArray(updatedRecords[todayKey]) ? updatedRecords[todayKey] : [];
+            todayList.push(amount);
+            updatedRecords[todayKey] = todayList;
+
+            const updatedData = {
+              balance: newBalance,
+              records: updatedRecords
+            };
+
+            personRef.set(updatedData)
+              .then(() => renderLedger(groupName))
+              .catch(err => alert('❌ 저장 실패: ' + err));
+          });
         }
       });
     }
   });
 }
 
-ledgerGroupSelect.addEventListener('change', e => {
-  renderLedger(e.target.value);
+ledgerGroupSelect.addEventListener('change', () => {
+  const group = ledgerGroupSelect.value;
+  if (group) renderLedger(group);
 });
 
-document.getElementById('ledger-btn-add-person').addEventListener('click', () => {
+addPersonBtn.addEventListener('click', () => {
   const group = ledgerGroupSelect.value;
   if (!group) return alert('소속을 먼저 선택하세요.');
 
@@ -93,11 +112,21 @@ document.getElementById('ledger-btn-add-person').addEventListener('click', () =>
   if (!name) return;
   const balance = parseInt(prompt('초기 금액을 입력하세요', '0')) || 0;
 
-  const newPerson = { balance, records: {} };
+  const todayKey = getTodayKey();
+const newPerson = {
+  balance,
+  records: {
+    [todayKey]: [balance]  // ✅ 최초 충전도 기록에 포함
+  }
+};
+
   const personRef = database.ref(`ledger/${group}/${name}`);
   personRef.set(newPerson)
     .then(() => renderLedger(group))
     .catch(err => alert('❌ 저장 실패: ' + err));
 });
 
-renderLedger(ledgerGroupSelect.value);
+window.addEventListener('DOMContentLoaded', () => {
+  const group = ledgerGroupSelect.value;
+  if (group) renderLedger(group);
+});

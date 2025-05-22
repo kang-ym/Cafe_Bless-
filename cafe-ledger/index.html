@@ -20,10 +20,12 @@
         <!-- css -->
         <link rel="stylesheet" href="../css/style.css">
         <!-- Java script -->
+        <script src="./src/login.js" defer></script>
+        <script  src="../src/auth.js" defer></script>
         <script src="../src/cafe-ledger.js" defer></script>
     </head>
 
-<body class="manager">
+<body class="Manager">
     <div class="mobile-container">
     <header class="manager-header">
         <div class="logo-container">
@@ -54,12 +56,7 @@
           <div class="ledger-table-container">
             <table class="ledger-table">
               <thead>
-                <tr>
-                  <th>이름</th>
-                  <th>현재 금액</th>
-                  <th>충전</th>
-                  <th>2025.6.21</th>
-                  <th>2025.6.28</th>
+                <tr id="ledger-table-head-row">
                 </tr>
               </thead>
               <tbody id="ledger-table-body"></tbody>
@@ -74,6 +71,5 @@
     </footer>
     </div>
 
-    <script src="../src/cafe-ledger.js"></script>
-  </body>
+</body>
 </html>

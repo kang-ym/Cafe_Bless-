@@ -1,80 +1,40 @@
+// orders.js - 오늘의 주문 화면 표시용 (displayDate 기준 비교)
+
 'use strict';
 
-// ✅ 오늘 날짜 설정
+// ✅ 오늘 날짜 구하기 (화면 표시용 형식과 일치)
 const today = new Date();
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, '0');
 const date = String(today.getDate()).padStart(2, '0');
-const getDate = `${year}-${month}-${date}`;
+const todayDisplay = `${year}.${month}.${date}`;  // 예: 2025.05.22
 
-// ✅ 화면 상단 날짜 표시
-const orderDate = document.getElementById('orderDate');
-if (orderDate) {
-  orderDate.textContent = getDate;
-}
+const orderList = document.getElementById('orderList');
 
-// ✅ 주문 데이터 불러오기
-function fetchOrdersFromFirebase() {
-  const ordersRef = database.ref('orders');
-  ordersRef.once('value')
-    .then(snapshot => {
-      const data = snapshot.val();
-      if (!data) {
-        console.log("📭 주문 없음");
-        return;
-      }
-      const orders = Object.values(data).filter(order => order.today === getDate);
-      renderOrders(orders);
-    })
-    .catch(error => {
-      console.error("❌ 주문 불러오기 실패:", error);
-    });
-}
+// ✅ Firebase에서 orders 불러오기
+const ordersRef = database.ref('orders');
+ordersRef.once('value').then(snapshot => {
+  const data = snapshot.val();
+  if (!data) return;
 
-// ✅ 주문 목록 출력 (잔액도 함께)
-function renderOrders(orders) {
-  const listContainer = document.getElementById('orderList');
-  if (!listContainer) return;
-  listContainer.innerHTML = '';
+  // ✅ displayDate로 오늘 주문 필터링
+  const orders = Object.entries(data).filter(([_, order]) => order.displayDate === todayDisplay);
 
-  orders.forEach((order, index) => {
-    const item = document.createElement('li');
-    item.className = 'order-item';
+  // ✅ 날짜 표시
+  const orderDateTitle = document.getElementById('orderDate');
+  orderDateTitle.textContent = todayDisplay;
 
-    const name = order.name;
-    const group = order.group;
-
-    if (!name || !group) return; // 이름과 그룹 필수
-
-    const ledgerRef = database.ref(`ledger/${group}/${name}/balance`);
-    ledgerRef.once('value').then(snapshot => {
-      const balance = snapshot.val();
-      const warning = balance !== null && balance <= 200 ? '‼️' : '';
-      const pointDisplay = balance !== null ? `(${balance}P)` : '';
-
-      item.innerHTML = `
-        <p>${order.coffee} / ${order.temperature} / ${order.size} / ${name} ${warning} ${pointDisplay}</p>
-        <label>
-          <input type="checkbox" data-index="${index}"> 完了
-        </label>
-      `;
-
-      listContainer.appendChild(item);
-    });
+  // ✅ 주문 렌더링
+  orders.reverse().forEach(([id, order]) => {
+    const div = document.createElement('div');
+    div.className = 'order-item';
+    const hotOrCold = order.temperature === 'hot' ? 'hot🔥' : 'cold❄️';
+    div.innerHTML = `
+      <p>${order.coffee} / ${hotOrCold} / ${order.size} / ${order.name} (${order.price}P)</p>
+      <label><input type="checkbox"> 完了</label>
+    `;
+    orderList.appendChild(div);
   });
-
-  // ✅ 완료 체크 처리
-  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', e => {
-      const parent = e.target.closest('.order-item');
-      if (e.target.checked) {
-        parent.classList.add('checked');
-      } else {
-        parent.classList.remove('checked');
-      }
-    });
-  });
-}
-
-// ✅ 실행
-fetchOrdersFromFirebase();
+}).catch(err => {
+  console.error('❌ 주문 불러오기 실패:', err);
+});
