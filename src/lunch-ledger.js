@@ -1,4 +1,34 @@
-// lunch-ledger.js - 점심 가계부 시스템 (+200円 이하 빨간색 표시)
+// lunch-ledger.js - 점심 가계부 시스템 (+200円 이하 빨간색 표시 포함)
+
+// ✅ 0. 비밀번호 잠금 기능 설정 (Cafe Ledger와 공유됨)
+window.addEventListener("DOMContentLoaded", () => {
+  const lunchLock = document.getElementById("lunchLedgerLock");
+  const lunchPwInput = document.getElementById("lunchLedgerPwInput");
+  const lunchPwBtn = document.getElementById("lunchLedgerPwBtn");
+  const commonPw = "trustonly";
+
+  const access = localStorage.getItem("ledgerAccess");
+  if (access === "true") {
+    lunchLock.style.display = "none";
+    const activeTab = document.querySelector('.lunch-ledger-tab a.active');
+    const group = activeTab?.dataset.group || '信仰';
+    renderLunchLedger(group);
+  }
+
+  lunchPwBtn?.addEventListener("click", () => {
+    const input = lunchPwInput.value.trim();
+    if (input === commonPw) {
+      lunchLock.style.display = "none";
+      localStorage.setItem("ledgerAccess", "true");
+      const activeTab = document.querySelector('.lunch-ledger-tab a.active');
+      const group = activeTab?.dataset.group || '信仰';
+      renderLunchLedger(group);
+    } else {
+      alert("パスワードが違います。再確認してください。");
+      lunchPwInput.value = "";
+    }
+  });
+});
 
 const lunchTableBody = document.getElementById('lunch-ledger-table-body');
 const addLunchPersonBtn = document.getElementById('lunch-ledger-btn-add-person');

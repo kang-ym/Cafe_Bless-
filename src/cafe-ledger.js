@@ -20,7 +20,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const input = pwInput.value.trim();
     if (input === cafeLedgerPassword) {
       lockScreen.style.display = "none";
-      localStorage.setItem("cafeLedgerAccess", "true");
+      localStorage.setItem("ledgerAccess", "true");
 
       const activeTab = document.querySelector('.cafe-ledger-tab a.active');
       const group = activeTab?.dataset.group || 'trust';
@@ -34,7 +34,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // ✅ 페이지 로드시 이미 통과한 사용자 자동 표시
 window.addEventListener("DOMContentLoaded", () => {
-  const access = localStorage.getItem("cafeLedgerAccess");
+  const access = localStorage.getItem("ledgerAccess");
   if (access === "true") {
     lockScreen.style.display = "none";
     const activeTab = document.querySelector('.cafe-ledger-tab a.active');
