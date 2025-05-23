@@ -2,22 +2,34 @@
 const cafeLedgerPassword = "trustonly";
 const lockScreen = document.getElementById("cafeLedgerLock");
 const pwInput = document.getElementById("cafeLedgerPwInput");
-const pwBtn = document.getElementById("cafeLedgerPwBtn");
+window.addEventListener("DOMContentLoaded", () => {
+  const pwBtn = document.getElementById("cafeLedgerPwBtn");
+  const pwInput = document.getElementById("cafeLedgerPwInput");
+  const lockScreen = document.getElementById("cafeLedgerLock");
+  const cafeLedgerPassword = "trustonly";
 
-// ✅ 확인 버튼 클릭 시 → 잠금 해제 및 렌더링
-pwBtn.addEventListener("click", () => {
-  const input = pwInput.value.trim();
-  if (input === cafeLedgerPassword) {
+  const access = localStorage.getItem("cafeLedgerAccess");
+  if (access === "true") {
     lockScreen.style.display = "none";
-    localStorage.setItem("cafeLedgerAccess", "true");
-
     const activeTab = document.querySelector('.cafe-ledger-tab a.active');
     const group = activeTab?.dataset.group || 'trust';
     renderLedger(group);
-  } else {
-    alert("パスワードが違います。再確認してください。");
-    pwInput.value = "";
   }
+
+  pwBtn.addEventListener("click", () => {
+    const input = pwInput.value.trim();
+    if (input === cafeLedgerPassword) {
+      lockScreen.style.display = "none";
+      localStorage.setItem("cafeLedgerAccess", "true");
+
+      const activeTab = document.querySelector('.cafe-ledger-tab a.active');
+      const group = activeTab?.dataset.group || 'trust';
+      renderLedger(group);
+    } else {
+      alert("パスワードが違います。再確認してください。");
+      pwInput.value = "";
+    }
+  });
 });
 
 // ✅ 페이지 로드시 이미 통과한 사용자 자동 표시
