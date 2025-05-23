@@ -51,7 +51,7 @@ loginForm.addEventListener("submit", (e) => {
       });
 
       // ✅ 로그인 성공 → 이동
-      window.location.href = "../home/";
+      window.location.href = "/Cafe_Bless-/home/";
     })
     .catch((error) => {
       console.error("ログインエラー:", error);
