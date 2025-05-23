@@ -1,18 +1,5 @@
 // cafe-ledger.js - 선택 삭제 기능 + 잠금 기능 통합
 
-// ✅ 1. Ledger 잠금 처리
-const cafeLedgerPassword = "trustonly"; // 원하는 비밀번호
-const lockScreen = document.createElement("div");
-lockScreen.className = "ledger-lock-screen";
-lockScreen.id = "cafeLedgerLock";
-lockScreen.innerHTML = `
-  <div class="ledger-lock-box">
-    <p>🔐 カフェガ計簿のパスワードを入力してください</p>
-    <input type="password" id="cafeLedgerPwInput" placeholder="パスワード">
-    <button id="cafeLedgerPwBtn">確認</button>
-  </div>
-`;
-document.body.appendChild(lockScreen);
 
 // ✅ 확인 버튼 클릭 시 잠금 해제 + 렌더링
 const pwBtn = document.getElementById("cafeLedgerPwBtn");
