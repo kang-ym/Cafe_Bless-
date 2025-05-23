@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <!-- Firebase 초기화 -->
+  <script src="../src/firebase-init.js"></script>
+
+  <!-- js -->
+  <script src="../src/login.js" defer></script>
+
+
+  <!-- CSS는 선택 -->
+  <style>
+    body { font-family: sans-serif; padding: 40px; text-align: center; }
+    input { margin: 10px; padding: 8px; width: 250px; }
+    button { padding: 10px 20px; }
+  </style>
+</head>
+<body>
+  <h2>Manager Login</h2>
+  <input type="email" id="loginEmail" placeholder="Email"><br />
+  <input type="password" id="loginPw" placeholder="Password"><br />
+  <button id="loginBtn">ログイン</button>
+
+</body>
+</html>

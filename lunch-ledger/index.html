@@ -14,8 +14,16 @@
         <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
         <!-- Firebase Database -->
         <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+        <!-- Firebase Authentication -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
         <!-- 공통 초기화 -->
         <script src="../src/firebase-init.js"></script>
+        <!-- 권한 검사 -->
+        <script type="module" src="/Cafe_Bless-/src/auth-check.js"></script>
+        <!-- logout -->
+        <script type="module" src="/Cafe_Bless-/src/logout.js"></script>
+
 
         <!-- css -->
         <link rel="stylesheet" href="../css/style.css">
@@ -31,7 +39,10 @@
         <div class="logo-container">
             <h1>Cafe Bless</h1>
         </div>
-        <a href="#" class="manager-btn">Manager Login</a>
+      <!-- 로그아웃 a태그 (로그인한 상태에서 표시됨) -->
+      <a href="#" class="manager-btn" id="logoutBtn">ログアウト</a>
+      <span id="userEmail" class="user-info"></span>
+
     </header>
 
     <nav>
