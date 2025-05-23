@@ -222,7 +222,9 @@ deleteSelectedBtn.addEventListener('click', () => {
   checkboxes.forEach(cb => {
     const name = cb.dataset.name;
     const group = cb.dataset.group;
-    database.ref(`ledger/${group}/${name}`).remove();
+    database.ref(`ledger/${group}/${name}`).remove()
+    .then(() => renderLedger(group))
+    .catch(err => console.error("❌ 삭제 실패:", err));
   });
 
   const activeTab = document.querySelector('.cafe-ledger-tab a.active');
