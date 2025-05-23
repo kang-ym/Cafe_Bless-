@@ -528,6 +528,41 @@ h3{
   /* ✅ CAFE LEDGER 관련 스타일 */
   /* -------------------------------------------------- */
   
+  /* ✅ Cafe Ledger 잠금용 스타일 (클래스 중복 없음) */
+.ledger-lock-screen {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.ledger-lock-box {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.ledger-lock-box input {
+  padding: 8px;
+  margin: 10px 0;
+  width: 200px;
+}
+
+.ledger-lock-box button {
+  padding: 8px 20px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+/* -------------- */
+
   .ledger-section h2 {
     margin-bottom: 10px;
   }

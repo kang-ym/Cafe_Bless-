@@ -1,5 +1,43 @@
-// cafe-ledger.js - 선택 삭제 기능 추가
+// cafe-ledger.js - 선택 삭제 기능 + 잠금 기능 통합
 
+// ✅ 1. Ledger 잠금 처리
+const cafeLedgerPassword = "trustonly"; // 원하는 비밀번호
+const lockScreen = document.createElement("div");
+lockScreen.className = "ledger-lock-screen";
+lockScreen.id = "cafeLedgerLock";
+lockScreen.innerHTML = `
+  <div class="ledger-lock-box">
+    <p>🔐 カフェガ計簿のパスワードを入力してください</p>
+    <input type="password" id="cafeLedgerPwInput" placeholder="パスワード">
+    <button id="cafeLedgerPwBtn">確認</button>
+  </div>
+`;
+document.body.appendChild(lockScreen);
+
+// ✅ 잠금 해제 버튼 동작
+document.getElementById("cafeLedgerPwBtn").addEventListener("click", () => {
+  const pw = document.getElementById("cafeLedgerPwInput").value.trim();
+  if (pw === cafeLedgerPassword) {
+    lockScreen.style.display = "none";
+    localStorage.setItem("cafeLedgerAccess", "true");
+  } else {
+    alert("パスワードが違います。");
+    document.getElementById("cafeLedgerPwInput").value = "";
+  }
+});
+
+// ✅ 페이지 로드시 잠금 확인
+window.addEventListener("DOMContentLoaded", () => {
+  const access = localStorage.getItem("cafeLedgerAccess");
+  if (access === "true") {
+    lockScreen.style.display = "none";
+    const activeTab = document.querySelector('.cafe-ledger-tab a.active');
+    const group = activeTab?.dataset.group || 'trust';
+    renderLedger(group);
+  }
+});
+
+// ✅ 선택 삭제 관련 요소
 const ledgerTableBody = document.getElementById('ledger-table-body');
 const addPersonBtn = document.getElementById('ledger-btn-add-person');
 
@@ -16,6 +54,7 @@ selectBtn.after(deleteSelectedBtn);
 
 let selectionMode = false;
 
+// ✅ 날짜 키 및 날짜 포맷 함수
 function getTodayKey() {
   const today = new Date();
   const year = today.getFullYear();
@@ -23,15 +62,12 @@ function getTodayKey() {
   const date = String(today.getDate()).padStart(2, '0');
   return `${year}_${month}_${date}`;
 }
-
 function formatDisplayDate(dateKey) {
   return dateKey.replace(/_/g, '.');
 }
-
 function formatRecordEntries(entries = []) {
   return entries.map(e => `${e > 0 ? '+' : ''}${e}`).join('<br>');
 }
-
 function collectAllDates(groupData) {
   const dateSet = new Set();
   for (const personName in groupData) {
@@ -43,6 +79,7 @@ function collectAllDates(groupData) {
   return Array.from(dateSet).sort().reverse();
 }
 
+// ✅ 가계부 렌더 함수
 function renderLedger(groupName) {
   const groupRef = database.ref(`ledger/${groupName}`);
   groupRef.once('value').then(snapshot => {
@@ -173,6 +210,7 @@ function renderLedger(groupName) {
   });
 }
 
+// ✅ 탭 클릭 시 그룹 변경
 const cafeLedgerTabs = document.querySelectorAll('.cafe-ledger-tab a');
 cafeLedgerTabs.forEach(tab => {
   tab.addEventListener('click', e => {
@@ -184,6 +222,7 @@ cafeLedgerTabs.forEach(tab => {
   });
 });
 
+// ✅ 사람 추가
 addPersonBtn.addEventListener('click', () => {
   const activeTab = document.querySelector('.cafe-ledger-tab a.active');
   const group = activeTab?.dataset.group || 'trust';
@@ -205,6 +244,7 @@ addPersonBtn.addEventListener('click', () => {
     .catch(err => alert('❌ 저장 실패: ' + err));
 });
 
+// ✅ 선택 삭제 기능
 selectBtn.addEventListener('click', () => {
   selectionMode = !selectionMode;
   const activeTab = document.querySelector('.cafe-ledger-tab a.active');
@@ -223,17 +263,7 @@ deleteSelectedBtn.addEventListener('click', () => {
     const name = cb.dataset.name;
     const group = cb.dataset.group;
     database.ref(`ledger/${group}/${name}`).remove()
-    .then(() => renderLedger(group))
-    .catch(err => console.error("❌ 삭제 실패:", err));
+      .then(() => renderLedger(group))
+      .catch(err => console.error("❌ 삭제 실패:", err));
   });
-
-  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
-  const group = activeTab?.dataset.group || 'trust';
-  renderLedger(group);
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
-  const group = activeTab?.dataset.group || 'trust';
-  renderLedger(group);
 });
