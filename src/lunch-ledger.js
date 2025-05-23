@@ -41,7 +41,7 @@ function collectAllDates(groupData) {
       Object.keys(person.records).forEach(date => dateSet.add(date));
     }
   }
-  return Array.from(dateSet).sort();
+  return Array.from(dateSet).sort().reverse();
 }
 
 function renderLunchLedger(groupName) {
