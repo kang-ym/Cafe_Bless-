@@ -1,7 +1,21 @@
-// lunch-ledger.js - 점심 가계부 시스템 (+게스트 삭제 추가)
+// lunch-ledger.js - 점심 가계부 시스템 (+200円 이하 빨간색 표시)
 
 const lunchTableBody = document.getElementById('lunch-ledger-table-body');
 const addLunchPersonBtn = document.getElementById('lunch-ledger-btn-add-person');
+
+// ✅ 선택/삭제 관련 요소 추가
+const selectBtn = document.createElement('button');
+selectBtn.textContent = '選択';
+selectBtn.id = 'lunch-ledger-btn-select';
+addLunchPersonBtn.after(selectBtn);
+
+const deleteSelectedBtn = document.createElement('button');
+deleteSelectedBtn.textContent = '削除';
+deleteSelectedBtn.id = 'lunch-ledger-btn-delete';
+deleteSelectedBtn.style.display = 'none';
+selectBtn.after(deleteSelectedBtn);
+
+let selectionMode = false;
 
 function getTodayKey() {
   const today = new Date();
@@ -38,6 +52,7 @@ function renderLunchLedger(groupName) {
 
     const headRow = document.getElementById('lunch-ledger-table-head-row');
     headRow.innerHTML = `
+      ${selectionMode ? '<th></th>' : ''}
       <th>名前</th>
       <th>現在金額</th>
       <th>決済</th>
@@ -55,10 +70,15 @@ function renderLunchLedger(groupName) {
       row.className = 'lunch-ledger-row';
 
       let rowHtml = '';
-      rowHtml += `<td>${personName}</td>`;
 
+      if (selectionMode) {
+        rowHtml += `<td><input type="checkbox" class="select-box" data-name="${personName}" data-group="${groupName}"></td>`;
+      }
+
+      const balanceClass = person.balance <= 200 ? 'low' : '';
+      rowHtml += `<td>${personName}</td>`;
       rowHtml += `
-        <td class="lunch-ledger-balance" data-balance="${person.balance}">${person.balance}円</td>
+        <td class="lunch-ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}円</td>
         <td><button class="lunch-ledger-charge" data-name="${personName}">決済</button></td>
         <td>
           <input type="number" class="lunch-ledger-input" placeholder="金額">
@@ -147,6 +167,31 @@ addLunchPersonBtn.addEventListener('click', () => {
     }
   };
   personRef.set(data).then(() => renderLunchLedger(group));
+});
+
+selectBtn.addEventListener('click', () => {
+  selectionMode = !selectionMode;
+  const activeTab = document.querySelector('.lunch-ledger-tab a.active');
+  const group = activeTab?.dataset.group || '信仰';
+  deleteSelectedBtn.style.display = selectionMode ? 'inline-block' : 'none';
+  renderLunchLedger(group);
+});
+
+deleteSelectedBtn.addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('.select-box:checked');
+  if (checkboxes.length === 0) return alert('削除する人を選択してください');
+
+  if (!confirm('選択したメンバーを全て削除しますか？')) return;
+
+  checkboxes.forEach(cb => {
+    const name = cb.dataset.name;
+    const group = cb.dataset.group;
+    database.ref(`lunchLedger/${group}/${name}`).remove();
+  });
+
+  const activeTab = document.querySelector('.lunch-ledger-tab a.active');
+  const group = activeTab?.dataset.group || '信仰';
+  renderLunchLedger(group);
 });
 
 window.addEventListener('DOMContentLoaded', () => {

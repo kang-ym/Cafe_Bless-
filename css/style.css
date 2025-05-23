@@ -638,6 +638,9 @@ h3{
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    >h2{
+        margin-bottom: 10px;
+    }
   }
   
   .lunch-ledger-tab {
@@ -687,6 +690,7 @@ h3{
   }
   .lunch-ledger-balance.low {
     color: red;
+    font-weight: bold;
   }
   
   .lunch-ledger-row:nth-child(even) {
@@ -732,6 +736,45 @@ h3{
   
   #lunch-ledger-btn-add-person:hover {
     background-color: #1976d2;
+  }
+  
+/* ✅ 선택/삭제 버튼 스타일 */
+#lunch-ledger-btn-select,
+#lunch-ledger-btn-delete {
+  padding: 5px 12px;
+  margin-left: 8px;
+  background-color: #f57c00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#lunch-ledger-btn-delete {
+  background-color: #e53935;
+}
+
+#lunch-ledger-btn-select:hover {
+  background-color: #ef6c00;
+}
+
+#lunch-ledger-btn-delete:hover {
+  background-color: #c62828;
+}
+
+/* ✅ 체크박스 정렬 개선 */
+.select-box {
+  transform: scale(1.2);
+  margin-right: 4px;
+}
+
+/* ✅ 체크박스 스타일 명확하게 설정 */
+.lunch-ledger-table input[type="checkbox"].select-box {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-accent); /* 주황 강조색 */
+    margin: auto;
+    display: inline-block;
   }
   
 
