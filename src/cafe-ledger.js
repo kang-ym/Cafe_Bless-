@@ -14,12 +14,18 @@ lockScreen.innerHTML = `
 `;
 document.body.appendChild(lockScreen);
 
-// ✅ 잠금 해제 버튼 동작
-document.getElementById("cafeLedgerPwBtn").addEventListener("click", () => {
+// ✅ 확인 버튼 클릭 시 잠금 해제 + 렌더링
+const pwBtn = document.getElementById("cafeLedgerPwBtn");
+pwBtn.addEventListener("click", () => {
   const pw = document.getElementById("cafeLedgerPwInput").value.trim();
   if (pw === cafeLedgerPassword) {
     lockScreen.style.display = "none";
     localStorage.setItem("cafeLedgerAccess", "true");
+
+    // ✅ 잠금 해제 시 렌더링 실행
+    const activeTab = document.querySelector('.cafe-ledger-tab a.active');
+    const group = activeTab?.dataset.group || 'trust';
+    renderLedger(group);
   } else {
     alert("パスワードが違います。");
     document.getElementById("cafeLedgerPwInput").value = "";
