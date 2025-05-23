@@ -186,7 +186,9 @@ deleteSelectedBtn.addEventListener('click', () => {
   checkboxes.forEach(cb => {
     const name = cb.dataset.name;
     const group = cb.dataset.group;
-    database.ref(`lunchLedger/${group}/${name}`).remove();
+    database.ref(`lunchLedger/${group}/${name}`).remove()
+    .then(() => renderLedger(group))
+    .catch(err => console.error("❌ 삭제 실패:", err));
   });
 
   const activeTab = document.querySelector('.lunch-ledger-tab a.active');
