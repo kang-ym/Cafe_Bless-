@@ -13,7 +13,8 @@
   <script src="./src/firebase-init.js"></script>
 
   <!-- js -->
-  <script src="./src/login.js" defer></script>
+  <script type="module" src="/Cafe_Bless-/src/login.js"></script>
+
 
 
   <!-- CSS는 선택 -->
@@ -25,9 +26,10 @@
 </head>
 <body>
   <h2>Manager Login</h2>
-  <input type="email" id="loginEmail" placeholder="Email"><br />
-  <input type="password" id="loginPw" placeholder="Password"><br />
-  <button id="loginBtn">ログイン</button>
-
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email"><br />
+    <input type="password" id="password" placeholder="Password"><br />
+    <button type="submit">ログイン</button>
+  </form>
 </body>
 </html>
