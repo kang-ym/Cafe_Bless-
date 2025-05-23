@@ -1,25 +1,26 @@
-// cafe-ledger.js - 선택 삭제 기능 + 잠금 기능 통합
-
-
-// ✅ 확인 버튼 클릭 시 잠금 해제 + 렌더링
+// ✅ Cafe Ledger 비밀번호 잠금 요소 불러오기
+const cafeLedgerPassword = "trustonly";
+const lockScreen = document.getElementById("cafeLedgerLock");
+const pwInput = document.getElementById("cafeLedgerPwInput");
 const pwBtn = document.getElementById("cafeLedgerPwBtn");
+
+// ✅ 확인 버튼 클릭 시 → 잠금 해제 및 렌더링
 pwBtn.addEventListener("click", () => {
-  const pw = document.getElementById("cafeLedgerPwInput").value.trim();
-  if (pw === cafeLedgerPassword) {
+  const input = pwInput.value.trim();
+  if (input === cafeLedgerPassword) {
     lockScreen.style.display = "none";
     localStorage.setItem("cafeLedgerAccess", "true");
 
-    // ✅ 잠금 해제 시 렌더링 실행
     const activeTab = document.querySelector('.cafe-ledger-tab a.active');
     const group = activeTab?.dataset.group || 'trust';
     renderLedger(group);
   } else {
-    alert("パスワードが違います。");
-    document.getElementById("cafeLedgerPwInput").value = "";
+    alert("パスワードが違います。再確認してください。");
+    pwInput.value = "";
   }
 });
 
-// ✅ 페이지 로드시 잠금 확인
+// ✅ 페이지 로드시 이미 통과한 사용자 자동 표시
 window.addEventListener("DOMContentLoaded", () => {
   const access = localStorage.getItem("cafeLedgerAccess");
   if (access === "true") {
