@@ -2,15 +2,15 @@
 // 이 파일에서는 설정과 초기화만!
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAjosihXyz...",
-    authDomain: "cafe-bless.firebaseapp.com",
-    databaseURL: "https://cafe-bless-default-rtdb.firebaseio.com",
-    projectId: "cafe-bless",
-    storageBucket: "cafe-bless.appspot.com",
-    messagingSenderId: "338610796982",
-    appId: "1:338610796982:web:xxx",
-    measurementId: "G-NK8RG23T9"
-  };
+  apiKey: "AIzaSyAjosiHexyZJWx8YS9M6D2sMDhAUtoGuT8",
+  authDomain: "cafe-bless.firebaseapp.com",
+  databaseURL: "https://cafe-bless-default-rtdb.firebaseio.com",
+  projectId: "cafe-bless",
+  storageBucket: "cafe-bless.firebasestorage.app",
+  messagingSenderId: "338610796982",
+  appId: "1:338610796982:web:1c7697bf5d25a77ea6a917",
+  measurementId: "G-NK8GRG23T9"
+};
   
   // 이미 초기화되어 있는 경우 중복 방지
   if (!firebase.apps.length) {
