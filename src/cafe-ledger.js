@@ -214,7 +214,7 @@ selectBtn.addEventListener('click', () => {
 });
 
 deleteSelectedBtn.addEventListener('click', () => {
-  const checkboxes = document.querySelectorAll('.select-box:checked');
+  const checkboxes = document.querySelectorAll('.ledger-select-box:checked');
   if (checkboxes.length === 0) return alert('削除する人を選択してください');
 
   if (!confirm('選択したメンバーを全て削除しますか？')) return;
