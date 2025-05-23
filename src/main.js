@@ -1,5 +1,10 @@
 'use strict';
 
+// ✅ GitHub Pages와 로컬 환경에 따라 이미지 경로 설정
+const imgBase = window.location.hostname.includes("github.io")
+  ? "/Cafe_Bless-/img/"
+  : "./img/";
+
 // ✅ 요소 선택
 const coffeeRadios = document.querySelectorAll('.coffe-box input[type="radio"]');
 const imgBoxes = document.querySelectorAll('.coffe-box .img-box');
@@ -18,9 +23,9 @@ const month = String(today.getMonth() + 1).padStart(2, '0');
 const date = String(today.getDate()).padStart(2, '0');
 const firebaseDate = `${year}_${month}_${date}`;
 const displayDate = `${year}.${month}.${date}`;
-
 document.getElementById('getdate').textContent = displayDate;
 
+// ✅ 커피 이미지 선택 시 시각적 강조
 function updateCoffeeSelection() {
   coffeeRadios.forEach((radio, index) => {
     imgBoxes[index].style.boxShadow = radio.checked
@@ -29,12 +34,14 @@ function updateCoffeeSelection() {
   });
 }
 
+// ✅ 온도 선택 스타일 갱신
 function updateHotColdSelection() {
   document.querySelectorAll('.hot-radio label').forEach(label => label.classList.remove('active'));
   const selected = document.querySelector('.hot-radio input:checked');
   if (selected) selected.nextElementSibling.classList.add('active');
 }
 
+// ✅ 사이즈 선택 스타일 갱신
 function updateSizeSelection() {
   document.querySelectorAll('.size-radio label').forEach(label => label.classList.remove('active'));
   const selected = document.querySelector('.size-radio input:checked');
@@ -43,6 +50,7 @@ function updateSizeSelection() {
 
 let isFirstOrder = true;
 
+// ✅ 주문 버튼 클릭 시 동작
 function handleOrder() {
   const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
   if (!selectedCoffee) {
@@ -53,7 +61,7 @@ function handleOrder() {
 
   const coffeeBox = selectedCoffee.closest('.coffe-box');
   const coffeeLabel = coffeeBox.querySelector('h3')?.dataset.en;
-  const coffeeLabelJp = coffeeBox.querySelector('h3')?.textContent.trim(); // ✅ 일본어 이름
+  const coffeeLabelJp = coffeeBox.querySelector('h3')?.textContent.trim();
   const hotOrCold = document.querySelector('.hot-radio input:checked')?.value;
   const size = document.querySelector('.size-radio input:checked')?.value.toUpperCase();
   const name = getCustomerName();
@@ -90,7 +98,7 @@ function handleOrder() {
     today: firebaseDate,
     displayDate: displayDate,
     coffee: coffeeLabel,
-    coffeeJp: coffeeLabelJp, // ✅ 일본어 이름 저장
+    coffeeJp: coffeeLabelJp,
     size,
     temperature: hotOrCold,
     quantity,
@@ -107,11 +115,13 @@ function handleOrder() {
   });
 }
 
+// ✅ 고객 이름 가져오기
 function getCustomerName() {
   const input = nameBox.querySelector('#customerName');
   return input ? input.value.trim() : '';
 }
 
+// ✅ 소속에 따른 이름 불러오기
 function loadNamesByGroup(group) {
   nameBox.innerHTML = '';
   if (group === 'guest') {
@@ -146,6 +156,7 @@ function loadNamesByGroup(group) {
   });
 }
 
+// ✅ 가계부 잔액 차감 처리
 function deductLedger(orderData) {
   const { group, name, price, today } = orderData;
   const ledgerRef = database.ref(`ledger/${group}/${name}`);
@@ -166,6 +177,7 @@ function deductLedger(orderData) {
   });
 }
 
+// ✅ 주문 정보 Firebase 저장
 function saveOrderToFirebase(orderData) {
   const newRef = database.ref('orders').push();
   newRef.set(orderData)
@@ -173,6 +185,7 @@ function saveOrderToFirebase(orderData) {
     .catch(err => console.error("❌ 주문 저장 실패:", err));
 }
 
+// ✅ 이벤트 리스너
 coffeeRadios.forEach(radio => radio.addEventListener('change', updateCoffeeSelection));
 hotRadios.forEach(radio => radio.addEventListener('change', updateHotColdSelection));
 sizeRadios.forEach(radio => radio.addEventListener('change', updateSizeSelection));
@@ -182,6 +195,7 @@ groupSelect.addEventListener('change', () => {
   loadNamesByGroup(selectedGroup);
 });
 
+// ✅ 초기 로드
 window.addEventListener('DOMContentLoaded', () => {
   updateCoffeeSelection();
   updateHotColdSelection();
