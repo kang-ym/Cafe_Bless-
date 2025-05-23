@@ -1,7 +1,20 @@
-// cafe-ledger.js - 탭 클릭 시 active 전환 및 정확한 소속 렌더링
+// cafe-ledger.js - 선택 삭제 기능 추가
 
 const ledgerTableBody = document.getElementById('ledger-table-body');
 const addPersonBtn = document.getElementById('ledger-btn-add-person');
+
+const selectBtn = document.createElement('button');
+selectBtn.textContent = '選択';
+selectBtn.id = 'ledger-btn-select';
+addPersonBtn.after(selectBtn);
+
+const deleteSelectedBtn = document.createElement('button');
+deleteSelectedBtn.textContent = '削除';
+deleteSelectedBtn.id = 'ledger-btn-delete';
+deleteSelectedBtn.style.display = 'none';
+selectBtn.after(deleteSelectedBtn);
+
+let selectionMode = false;
 
 function getTodayKey() {
   const today = new Date();
@@ -38,6 +51,7 @@ function renderLedger(groupName) {
 
     const ledgerTableHead = document.getElementById('ledger-table-head-row');
     ledgerTableHead.innerHTML = `
+      ${selectionMode ? '<th></th>' : ''}
       ${groupName === 'guest' ? '<th class="cafe-ledger-col">소속</th>' : ''}
       <th class="cafe-ledger-col">名前</th>
       <th class="cafe-ledger-col">残高</th>
@@ -55,7 +69,9 @@ function renderLedger(groupName) {
       row.className = 'cafe-ledger-row';
 
       let rowHtml = '';
-
+      if (selectionMode) {
+        rowHtml += `<td><input type="checkbox" class="select-box" data-name="${personName}" data-group="${groupName}"></td>`;
+      }
       if (groupName === 'guest') {
         rowHtml += `<td class="cafe-ledger-col">ゲスト</td>`;
         rowHtml += `<td class="cafe-ledger-col"><input type="text" class="edit-name" value="${personName}" data-old="${personName}"></td>`;
@@ -157,7 +173,6 @@ function renderLedger(groupName) {
   });
 }
 
-// ✅ 탭 클릭 시 active 클래스 갱신 + 그룹 렌더링
 const cafeLedgerTabs = document.querySelectorAll('.cafe-ledger-tab a');
 cafeLedgerTabs.forEach(tab => {
   tab.addEventListener('click', e => {
@@ -188,6 +203,31 @@ addPersonBtn.addEventListener('click', () => {
   personRef.set(newPerson)
     .then(() => renderLedger(group))
     .catch(err => alert('❌ 저장 실패: ' + err));
+});
+
+selectBtn.addEventListener('click', () => {
+  selectionMode = !selectionMode;
+  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
+  const group = activeTab?.dataset.group || 'trust';
+  deleteSelectedBtn.style.display = selectionMode ? 'inline-block' : 'none';
+  renderLedger(group);
+});
+
+deleteSelectedBtn.addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('.select-box:checked');
+  if (checkboxes.length === 0) return alert('削除する人を選択してください');
+
+  if (!confirm('選択したメンバーを全て削除しますか？')) return;
+
+  checkboxes.forEach(cb => {
+    const name = cb.dataset.name;
+    const group = cb.dataset.group;
+    database.ref(`ledger/${group}/${name}`).remove();
+  });
+
+  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
+  const group = activeTab?.dataset.group || 'trust';
+  renderLedger(group);
 });
 
 window.addEventListener('DOMContentLoaded', () => {

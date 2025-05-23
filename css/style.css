@@ -627,6 +627,39 @@ h3{
     overflow-x: auto;
   }
   
+  /* ✅ 선택/삭제 버튼 스타일 (Cafe Ledger용) */
+#ledger-btn-select,
+#ledger-btn-delete {
+  padding: 5px 12px;
+  margin-left: 8px;
+  background-color: #f57c00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#ledger-btn-delete {
+  background-color: #e53935;
+}
+
+#ledger-btn-select:hover {
+  background-color: #ef6c00;
+}
+
+#ledger-btn-delete:hover {
+  background-color: #c62828;
+}
+
+/* ✅ 체크박스 스타일 (Cafe Ledger 선택 모드) */
+.select-box {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-accent);
+  margin: auto;
+  display: inline-block;
+}
+
 
 /* lunch-ledger 공통 구조 */
 .lunch-ledger-main {
