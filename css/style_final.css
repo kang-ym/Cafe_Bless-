@@ -512,27 +512,22 @@ h3{
     width: 100%;
     height: 100%;
 }
-/* -------------------------------------------------- */
-/* ✅ ORDER 관련 스타일 */
-/* -------------------------------------------------- */
+/* order */
 
-.order-line {
+
+.order-line{
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 6px 0;
-  }
-  
-  
-  /* -------------------------------------------------- */
-  /* ✅ CAFE LEDGER 관련 스타일 */
-  /* -------------------------------------------------- */
-  
-  .ledger-section h2 {
+}
+
+/* cafe-ledger */
+.ledger-section h2{
     margin-bottom: 10px;
-  }
-  
-  .cafe-ledger-tab {
+}
+/* ✅ 탭 메뉴 스타일 */
+.cafe-ledger-tab {
     display: flex;
     gap: 10px;
     margin-bottom: 16px;
@@ -558,11 +553,13 @@ h3{
     color: white;
   }
   
+  /* ✅ 테이블 행 구분 강조 */
   .cafe-ledger-row:nth-child(even) {
     background-color: #fafafa;
   }
   
-  .ledger-table {
+
+.ledger-table {
     width: 100%;
     border-collapse: collapse;
     background: #fff;
@@ -623,7 +620,7 @@ h3{
     background-color: #fff;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   
   .ledger-table-container {
@@ -631,44 +628,41 @@ h3{
   }
   
   /* ✅ 선택/삭제 버튼 스타일 (Cafe Ledger용) */
-  #ledger-btn-select,
-  #ledger-btn-delete {
-    padding: 5px 12px;
-    margin-left: 8px;
-    background-color: #f57c00;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  #ledger-btn-delete {
-    background-color: #e53935;
-  }
-  
-  #ledger-btn-select:hover {
-    background-color: #ef6c00;
-  }
-  
-  #ledger-btn-delete:hover {
-    background-color: #c62828;
-  }
-  
-  /* ✅ 체크박스 스타일 (Cafe Ledger 선택 모드) */
-  .ledger-select-box {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--color-accent);
-    margin: auto;
-    display: inline-block;
-  }
-  
-  
-  /* -------------------------------------------------- */
-  /* ✅ LUNCH LEDGER 관련 스타일 */
-  /* -------------------------------------------------- */
-  
-  .lunch-ledger-main {
+#ledger-btn-select,
+#ledger-btn-delete {
+  padding: 5px 12px;
+  margin-left: 8px;
+  background-color: #f57c00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#ledger-btn-delete {
+  background-color: #e53935;
+}
+
+#ledger-btn-select:hover {
+  background-color: #ef6c00;
+}
+
+#ledger-btn-delete:hover {
+  background-color: #c62828;
+}
+
+/* ✅ 체크박스 스타일 (Cafe Ledger 선택 모드) */
+.select-box {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-accent);
+  margin: auto;
+  display: inline-block;
+}
+
+
+/* lunch-ledger 공통 구조 */
+.lunch-ledger-main {
     padding: 16px;
   }
   
@@ -676,11 +670,10 @@ h3{
     background-color: #fff;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .lunch-ledger-section > h2 {
-    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    >h2{
+        margin-bottom: 10px;
+    }
   }
   
   .lunch-ledger-tab {
@@ -699,11 +692,9 @@ h3{
     font-weight: 500;
     transition: background-color 0.2s;
   }
-  
   .lunch-ledger-tab a:hover {
     background-color: #bbdefb;
   }
-  
   .lunch-ledger-tab a.active {
     background-color: #2196f3;
     color: white;
@@ -730,7 +721,6 @@ h3{
   .lunch-ledger-balance {
     font-weight: bold;
   }
-  
   .lunch-ledger-balance.low {
     color: red;
     font-weight: bold;
@@ -758,7 +748,6 @@ h3{
   .lunch-ledger-charge:hover {
     background-color: #45a049;
   }
-  
   .lunch-ledger-confirm:hover {
     background-color: #1976d2;
   }
@@ -782,35 +771,41 @@ h3{
     background-color: #1976d2;
   }
   
-  /* ✅ 선택/삭제 버튼 스타일 (Lunch Ledger용) */
-  #lunch-ledger-btn-select,
-  #lunch-ledger-btn-delete {
-    padding: 5px 12px;
-    margin-left: 8px;
-    background-color: #f57c00;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  #lunch-ledger-btn-delete {
-    background-color: #e53935;
-  }
-  
-  #lunch-ledger-btn-select:hover {
-    background-color: #ef6c00;
-  }
-  
-  #lunch-ledger-btn-delete:hover {
-    background-color: #c62828;
-  }
-  
-  /* ✅ 체크박스 스타일 (Lunch Ledger) */
-  .lunch-ledger-select-box {
+/* ✅ 선택/삭제 버튼 스타일 */
+#lunch-ledger-btn-select,
+#lunch-ledger-btn-delete {
+  padding: 5px 12px;
+  margin-left: 8px;
+  background-color: #f57c00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#lunch-ledger-btn-delete {
+  background-color: #e53935;
+}
+
+#lunch-ledger-btn-select:hover {
+  background-color: #ef6c00;
+}
+
+#lunch-ledger-btn-delete:hover {
+  background-color: #c62828;
+}
+
+/* ✅ 체크박스 정렬 개선 */
+.select-box {
+  transform: scale(1.2);
+  margin-right: 4px;
+}
+
+/* ✅ 체크박스 스타일 명확하게 설정 */
+.lunch-ledger-table input[type="checkbox"].select-box {
     width: 18px;
     height: 18px;
-    accent-color: var(--color-accent);
+    accent-color: var(--color-accent); /* 주황 강조색 */
     margin: auto;
     display: inline-block;
   }

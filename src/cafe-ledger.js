@@ -70,7 +70,7 @@ function renderLedger(groupName) {
 
       let rowHtml = '';
       if (selectionMode) {
-        rowHtml += `<td><input type="checkbox" class="select-box" data-name="${personName}" data-group="${groupName}"></td>`;
+        rowHtml += `<td><input type="checkbox" class="ledger-select-box" data-name="${personName}" data-group="${groupName}"></td>`;
       }
       if (groupName === 'guest') {
         rowHtml += `<td class="cafe-ledger-col">ゲスト</td>`;

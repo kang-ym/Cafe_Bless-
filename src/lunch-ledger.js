@@ -72,7 +72,7 @@ function renderLunchLedger(groupName) {
       let rowHtml = '';
 
       if (selectionMode) {
-        rowHtml += `<td><input type="checkbox" class="select-box" data-name="${personName}" data-group="${groupName}"></td>`;
+        rowHtml += `<td><input type="checkbox" class="lunch-ledger-select-box" data-name="${personName}" data-group="${groupName}"></td>`;
       }
 
       const balanceClass = person.balance <= 200 ? 'low' : '';
