@@ -179,6 +179,7 @@ main{
 }
 /* order box */
 .order-box{
+    color: var(--color-bg);
     width: 100%;
     background-color: var(--color-primary);
     padding: 10px;
@@ -512,6 +513,8 @@ h3{
     height: 100%;
 }
 /* order */
+
+
 .order-line{
     display: flex;
     justify-content: space-between;
@@ -520,12 +523,15 @@ h3{
 }
 
 /* cafe-ledger */
-
+.ledger-section h2{
+    margin-bottom: 10px;
+}
 /* ✅ 탭 메뉴 스타일 */
 .cafe-ledger-tab {
     display: flex;
     gap: 10px;
     margin-bottom: 16px;
+    align-items: center;
   }
   
   .cafe-ledger-tab a {
@@ -586,7 +592,6 @@ h3{
   }
   
   #ledger-btn-add-person {
-    margin-bottom: 10px;
     padding: 5px 12px;
     background-color: #2196f3;
     color: white;

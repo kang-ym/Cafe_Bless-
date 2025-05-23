@@ -33,7 +33,7 @@ ordersRef.once('value').then(snapshot => {
 
     div.innerHTML = `
       <p class="order-line">
-        <span>${coffeeName} / ${hotOrCold} / ${order.size} / ${order.group} / ${order.name} (${order.price}P)</span>
+        <span>${coffeeName} / ${hotOrCold} / ${order.size} / ${order.group} / ${order.name} (${order.price}円)</span>
         <label><input type="checkbox"> 完了</label>
       </p>
     `;

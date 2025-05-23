@@ -16,7 +16,7 @@ function formatDisplayDate(dateKey) {
 }
 
 function formatRecordEntries(entries = []) {
-  return entries.map(e => `${e > 0 ? '+' : ''}${e}엔`).join('<br>');
+  return entries.map(e => `${e > 0 ? '+' : ''}${e}`).join('<br>');
 }
 
 function collectAllDates(groupData) {
@@ -39,11 +39,11 @@ function renderLedger(groupName) {
     const ledgerTableHead = document.getElementById('ledger-table-head-row');
     ledgerTableHead.innerHTML = `
       ${groupName === 'guest' ? '<th class="cafe-ledger-col">소속</th>' : ''}
-      <th class="cafe-ledger-col">이름</th>
-      <th class="cafe-ledger-col">현재 금액</th>
-      <th class="cafe-ledger-col">충전</th>
+      <th class="cafe-ledger-col">名前</th>
+      <th class="cafe-ledger-col">残高</th>
+      <th class="cafe-ledger-col">チャージ</th>
       ${allDates.map(date => `<th class="cafe-ledger-date">${formatDisplayDate(date)}</th>`).join('')}
-      ${groupName === 'guest' ? '<th class="cafe-ledger-col">이동</th>' : ''}
+      ${groupName === 'guest' ? '<th class="cafe-ledger-col">移動</th>' : ''}
     `;
 
     ledgerTableBody.innerHTML = '';
@@ -64,8 +64,8 @@ function renderLedger(groupName) {
       }
 
       rowHtml += `
-        <td class="ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}엔</td>
-        <td><button class="ledger-btn-charge cafe-ledger-btn" data-name="${personName}">충전</button></td>
+        <td class="ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}</td>
+        <td><button class="ledger-btn-charge cafe-ledger-btn" data-name="${personName}">+</button></td>
       `;
 
       allDates.forEach(date => {
@@ -81,7 +81,7 @@ function renderLedger(groupName) {
               <option value="希望">希望</option>
               <option value="愛">愛</option>
             </select>
-            <button class="move-btn cafe-ledger-btn" data-name="${personName}">이동</button>
+            <button class="move-btn cafe-ledger-btn" data-name="${personName}">移動</button>
           </td>
         `;
       }
