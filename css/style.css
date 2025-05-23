@@ -628,6 +628,113 @@ h3{
   }
   
 
+/* lunch-ledger 공통 구조 */
+.lunch-ledger-main {
+    padding: 16px;
+  }
+  
+  .lunch-ledger-section {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .lunch-ledger-tab {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  
+  .lunch-ledger-tab a {
+    padding: 6px 14px;
+    background-color: #e3f2fd;
+    color: #333;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  .lunch-ledger-tab a:hover {
+    background-color: #bbdefb;
+  }
+  .lunch-ledger-tab a.active {
+    background-color: #2196f3;
+    color: white;
+  }
+  
+  .lunch-ledger-table-container {
+    overflow-x: auto;
+  }
+  
+  .lunch-ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    margin-bottom: 20px;
+  }
+  
+  .lunch-ledger-table th,
+  .lunch-ledger-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+  }
+  
+  .lunch-ledger-balance {
+    font-weight: bold;
+  }
+  .lunch-ledger-balance.low {
+    color: red;
+  }
+  
+  .lunch-ledger-row:nth-child(even) {
+    background-color: #fafafa;
+  }
+  
+  .lunch-ledger-charge,
+  .lunch-ledger-confirm {
+    padding: 4px 10px;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin: 2px;
+  }
+  
+  .lunch-ledger-confirm {
+    background-color: #2196f3;
+  }
+  
+  .lunch-ledger-charge:hover {
+    background-color: #45a049;
+  }
+  .lunch-ledger-confirm:hover {
+    background-color: #1976d2;
+  }
+  
+  .lunch-ledger-input {
+    width: 60px;
+    text-align: center;
+    margin-right: 4px;
+  }
+  
+  #lunch-ledger-btn-add-person {
+    padding: 5px 12px;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  #lunch-ledger-btn-add-person:hover {
+    background-color: #1976d2;
+  }
+  
+
 /* footer */
 footer{
     display: flex;
