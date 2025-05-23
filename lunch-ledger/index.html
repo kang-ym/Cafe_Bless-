@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="jp">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Manager Page</title>
+        <!-- googlefont -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&family=M+PLUS+Rounded+1c&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <!-- fontawesome -->
+        <script src="https://kit.fontawesome.com/fcbf2015e7.js" crossorigin="anonymous"></script>
+        <!-- Firebase App (필수) -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+        <!-- Firebase Database -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+        <!-- 공통 초기화 -->
+        <script src="../src/firebase-init.js"></script>
+
+        <!-- css -->
+        <link rel="stylesheet" href="../css/style.css">
+        <!-- Java script -->
+        <script src="./src/login.js" defer></script>
+        <script  src="../src/auth.js" defer></script>
+        <script src="../src/lunch-ledger.js" defer></script>
+    </head>
+
+<body class="Manager">
+    <div class="mobile-container">
+    <header class="manager-header">
+        <div class="logo-container">
+            <h1>Cafe Bless</h1>
+        </div>
+        <a href="#" class="manager-btn">Manager Login</a>
+    </header>
+
+    <nav>
+        <ul class="nav-box">
+            <li><a href="/home/">Home</a></li>
+            <li><a href="/orders/">Today's Orders</a></li>
+            <li><a href="/cafe-ledger/">Cafe Ledger</a></li>
+            <li><a href="#">Lunch Ledger</a></li>
+        </ul>
+    </nav>
+
+    <main class="lunch-ledger-main">
+        <section class="lunch-ledger-section">
+          <h2>🍱 ランチ計簿｜Lunch Ledger</h2>
+      
+          <div class="lunch-ledger-tab">
+            <a href="#" data-group="信仰" class="active">信仰</a>
+            <a href="#" data-group="希望">希望</a>
+            <a href="#" data-group="愛">愛</a>
+            <a href="#" data-group="guest">ゲスト</a>
+            <button id="lunch-ledger-btn-add-person">＋ カスタマー追加</button>
+          </div>
+      
+          <div class="lunch-ledger-table-container">
+            <table class="lunch-ledger-table">
+              <thead>
+                <tr id="lunch-ledger-table-head-row"></tr>
+              </thead>
+              <tbody id="lunch-ledger-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+      
+
+    <footer class="manager-footer">
+        <p><small>&copy; Cofe Bless all rights reserved.</small></p>
+    </footer>
+    </div>
+
+</body>
+</html>
