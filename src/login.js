@@ -1,4 +1,4 @@
-// ✅ Firebase 인증 및 DB 불러오기
+// ✅ Firebase SDK 모듈 import (최상단에만 위치 가능)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import {
   getAuth,
@@ -10,7 +10,7 @@ import {
   set
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-// ✅ Firebase 설정 (firebase-init.js의 내용을 직접 포함하거나 import 가능)
+// ✅ Firebase 프로젝트 설정 (자신의 firebaseConfig로 대체 가능)
 const firebaseConfig = {
   apiKey: "AIzaSyAjosiHexyZJWx8YS9M6D2sMDhAUtoGuT8",
   authDomain: "cafe-bless.firebaseapp.com",
@@ -22,39 +22,43 @@ const firebaseConfig = {
   measurementId: "G-NK8GRG23T9"
 };
 
-// ✅ Firebase 앱 초기화
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const database = getDatabase(app);
+// ✅ DOM이 완전히 로드된 후에 실행 (DOM 요소를 안전하게 다루기 위해)
+document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Firebase 앱 및 서비스 초기화
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
 
-// ✅ DOM 요소
-const loginForm = document.getElementById("loginForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
+  // ✅ 로그인 폼 및 입력 요소 가져오기
+  const loginForm = document.getElementById("loginForm");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
 
-// ✅ 로그인 이벤트
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+  // ✅ 로그인 폼 제출 이벤트 처리
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault(); // 기본 제출 동작 방지
 
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+    const email = emailInput.value.trim();   // 입력한 이메일
+    const password = passwordInput.value;    // 입력한 비밀번호
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
+    // ✅ Firebase 이메일/비밀번호 로그인 시도
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
 
-      // ✅ 로그인 정보 기록
-      const loginRef = ref(database, "logins/" + user.uid);
-      set(loginRef, {
-        email: user.email,
-        timestamp: new Date().toISOString()
+        // ✅ 로그인 성공 시, 로그인 기록을 DB에 저장
+        const loginRef = ref(database, "logins/" + user.uid);
+        set(loginRef, {
+          email: user.email,
+          timestamp: new Date().toISOString()  // 현재 시간 기록
+        });
+
+        // ✅ 로그인 성공 후 메인 페이지로 이동
+        window.location.href = "/Cafe_Bless-/home/";
+      })
+      .catch((error) => {
+        console.error("ログインエラー:", error);
+        alert("로그イン失敗: " + error.message);  // 에러 메시지 표시
       });
-
-      // ✅ 로그인 성공 → 이동
-      window.location.href = "/Cafe_Bless-/home/";
-    })
-    .catch((error) => {
-      console.error("ログインエラー:", error);
-      alert("ログイン失敗: " + error.message);
-    });
+  });
 });
