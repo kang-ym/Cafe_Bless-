@@ -1,5 +1,8 @@
 'use strict';
 
+import { database } from './firebase-init.js';
+
+
 // ✅ GitHub Pages와 로컬 환경에 따라 이미지 경로 설정
 const imgBase = window.location.hostname.includes("github.io")
   ? "/Cafe_Bless-/img/"

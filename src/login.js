@@ -1,3 +1,6 @@
+
+import { database } from './firebase-init.js';
+
 // ✅ Firebase SDK 모듈 import (최상단에만 위치 가능)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import {
