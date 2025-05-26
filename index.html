@@ -50,14 +50,20 @@
 <body>
 
     <div class="mobile-container">
-        <div class="use-container">
+        <div class="use-container" id="useContainer">
             <div class="use-img-box">
-                <img src="./img/use.webp" alt="">
+                <!-- 설명 이미지 또는 안내 내용 -->
+                <img src="./img/use.webp" alt="사용 방법 안내">
                 <button class="close-btn">
                     <span></span>
                 </button>
+                <!-- 오늘 하루 보지 않기 -->
+                <div class="do-not-show">
+                    <input type="checkbox" id="hideToday">
+                    <label for="hideToday">오늘 하루 보지 않기</label>
+                </div>
             </div>
-        </div> <!-- use-container -->
+        </div>
 
         <header>
             <div class="logo-container">

@@ -87,8 +87,8 @@ body{
 .close-btn{
     display: none;
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 1.5rem;
+    right: .1rem;
     z-index: 10;
     background-color: transparent;
     width: 50px;
@@ -116,6 +116,12 @@ body{
             transform: rotate(90deg);
         }
     }
+}
+.do-not-show {
+  display: none;
+  text-align: center;
+  margin-top: 10px;
+  color: white;
 }
 
 
@@ -892,7 +898,9 @@ footer{
     .close-btn{
         display: block;
     }
-
+    .do-not-show{
+      display: block;
+    }
 
     .select-box{
         position: relative;
