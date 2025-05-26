@@ -5,9 +5,7 @@ import {
   ref,
   get,
   set,
-  push,
-  child,
-  update
+  push
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
 // ✅ 요소 선택
@@ -21,14 +19,7 @@ const quantityInput = document.getElementById('coffeeQuantity');
 const groupSelect = document.getElementById('group');
 const nameBox = document.getElementById('nameBox');
 
-// ✅ 일본어 → Firebase 키
-const groupMap = {
-  '信仰': 'trust',
-  '希望': 'desire',
-  '愛': 'love',
-  'guest': 'guest'
-};
-
+// ✅ 오늘 날짜
 const today = new Date();
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -37,7 +28,7 @@ const firebaseDate = `${year}_${month}_${date}`;
 const displayDate = `${year}.${month}.${date}`;
 document.getElementById('getdate').textContent = displayDate;
 
-// ✅ 선택된 커피 시각 강조
+// ✅ 커피 선택 시 강조
 function updateCoffeeSelection() {
   coffeeRadios.forEach((radio, index) => {
     imgBoxes[index].style.boxShadow = radio.checked
@@ -46,12 +37,12 @@ function updateCoffeeSelection() {
   });
 }
 
+// ✅ 온도/사이즈 스타일 갱신
 function updateHotColdSelection() {
   document.querySelectorAll('.hot-radio label').forEach(label => label.classList.remove('active'));
   const selected = document.querySelector('.hot-radio input:checked');
   if (selected) selected.nextElementSibling.classList.add('active');
 }
-
 function updateSizeSelection() {
   document.querySelectorAll('.size-radio label').forEach(label => label.classList.remove('active'));
   const selected = document.querySelector('.size-radio input:checked');
@@ -60,6 +51,7 @@ function updateSizeSelection() {
 
 let isFirstOrder = true;
 
+// ✅ 주문 버튼 클릭 처리
 function handleOrder() {
   const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
   if (!selectedCoffee) {
@@ -102,8 +94,7 @@ function handleOrder() {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const groupJp = groupSelect.value;
-  const group = groupMap[groupJp];
+  const group = groupSelect.value; // ✅ 일본어 그대로 사용
 
   const orderData = {
     timestamp: new Date().toISOString(),
@@ -115,7 +106,7 @@ function handleOrder() {
     temperature: hotOrCold,
     quantity,
     name,
-    group,
+    group, // ✅ 일본어 그대로 저장
     price: totalPrice
   };
 
@@ -127,16 +118,17 @@ function handleOrder() {
   });
 }
 
+// ✅ 이름 가져오기
 function getCustomerName() {
   const input = nameBox.querySelector('#customerName');
   return input ? input.value.trim() : '';
 }
 
-// ✅ 이름 로딩 (v9 호환) 🔧 수정됨
+// ✅ 그룹에 따라 이름 목록 불러오기
 function loadNamesByGroup(group) {
   nameBox.innerHTML = '';
 
-  if (group === 'guest') {
+  if (group === 'ゲスト') {
     const input = document.createElement('input');
     input.type = 'text';
     input.id = 'customerName';
@@ -169,7 +161,7 @@ function loadNamesByGroup(group) {
   });
 }
 
-// ✅ 잔액 차감 (v9 호환) 🔧 수정됨
+// ✅ 잔액 차감 처리
 function deductLedger(orderData) {
   const { group, name, price, today } = orderData;
 
@@ -191,7 +183,7 @@ function deductLedger(orderData) {
   });
 }
 
-// ✅ 주문 저장 (v9 호환) 🔧 수정됨
+// ✅ 주문 정보 저장
 function saveOrderToFirebase(orderData) {
   const newOrderRef = push(ref(database, 'orders'));
   set(newOrderRef, orderData)
@@ -199,22 +191,20 @@ function saveOrderToFirebase(orderData) {
     .catch(err => console.error("❌ 주문 저장 실패:", err));
 }
 
-// ✅ 리스너 설정
+// ✅ 리스너 등록
 coffeeRadios.forEach(radio => radio.addEventListener('change', updateCoffeeSelection));
 hotRadios.forEach(radio => radio.addEventListener('change', updateHotColdSelection));
 sizeRadios.forEach(radio => radio.addEventListener('change', updateSizeSelection));
 
 groupSelect.addEventListener('change', () => {
-  const groupJp = groupSelect.value;
-  const group = groupMap[groupJp];
-  loadNamesByGroup(group);
+  const group = groupSelect.value;
+  loadNamesByGroup(group); // ✅ 일본어 그대로
 });
 
 window.addEventListener('DOMContentLoaded', () => {
   updateCoffeeSelection();
   updateHotColdSelection();
   updateSizeSelection();
-  const groupJp = groupSelect.value;
-  const group = groupMap[groupJp];
+  const group = groupSelect.value;
   if (group) loadNamesByGroup(group);
 });
