@@ -200,6 +200,34 @@ main{
     line-height: 1.5;
 }
 
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  color: #333;
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.order-table th,
+.order-table td {
+  border: 1px solid #ccc;
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.order-table th {
+  background-color: var(--color-accent-light);
+  font-weight: normal;
+}
+
+.order-table tr:nth-child(even) {
+  background-color: #fdf6f2;
+}
+
+
 
 .coffee-container{
     margin-bottom: 20px;
