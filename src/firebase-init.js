@@ -1,6 +1,7 @@
 // firebase-init.js (v9 모듈 방식)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"; 
 
 const firebaseConfig = {
   apiKey: "AIzaSyAjosiHexyZJWx8YS9M6D2sMDhAUtoGuT8",
@@ -15,5 +16,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+const auth = getAuth(app);
 
-export { app, database };
+export { app, database, auth};

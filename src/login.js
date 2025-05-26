@@ -1,53 +1,47 @@
 'use strict';
 
+// Firebase Auth 모듈 가져오기
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { auth } from "./firebase-init.js"; // 이미 초기화된 auth 사용
+
+// 페이지 로딩 후 이벤트 연결
 window.addEventListener('DOMContentLoaded', () => {
   const loginBtn = document.getElementById("loginBtn");
-  const loginInput = document.getElementById("passwordInput");
-  const loginBox = document.querySelector(".login-container");
-  const loginCloseBtn = document.querySelector(".login-close-btn");
-  const managerBtn = document.querySelector(".manager-btn");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("passwordInput");
 
-  // ✅ index.html 등에서 login 관련 요소가 없을 수 있으므로 조건 체크
-  if (!loginBtn || !loginInput || !loginBox || !managerBtn) return;
+  // 버튼이나 input 요소가 없는 경우 종료
+  if (!loginBtn || !emailInput || !passwordInput) return;
 
-  // ✅ 로그인 창 열기 / 로그아웃
-  managerBtn.addEventListener("click", () => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
+  // 로그인 버튼 클릭 시 동작
+  loginBtn.addEventListener("click", (e) => {
+    e.preventDefault(); // 폼 기본 제출 방지
 
-    if (isLoggedIn === "true") {
-      // ✅ 로그아웃 처리
-      localStorage.removeItem("isLoggedIn");
-      alert("ログアウトしました。");
-      window.location.href = "index.html";
-      managerBtn.textContent = "Manager Login";
-      loginInput.value = "";
-      location.reload();
-    } else {
-      // ✅ 로그인 창 열기
-      loginBox.style.display = "flex";
-      loginInput.focus();
-    }
-  });
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
-  // ✅ 로그인 창 닫기
-  if (loginCloseBtn) {
-    loginCloseBtn.addEventListener("click", () => {
-      loginBox.style.display = "none";
-      loginInput.value = "";
-    });
-  }
+    // Firebase 인증 시도
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        const userEmail = user.email;
 
-  // ✅ 로그인 버튼 클릭
-  loginBtn.addEventListener("click", () => {
-    const password = loginInput.value;
-    if (password === "blesscafe") {
-      // ✅ 로그인 성공 처리
-      localStorage.setItem("isLoggedIn", "true");
-      alert("ログイン成功！");
-      window.location.href = "home/"; // 원하는 페이지 경로로 이동
-    } else {
-      alert("パスワードが違います。");
-      loginInput.value = "";
-    }
+        // ✅ 권한 분기
+        if (userEmail === "admin@cafebless.com") {
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("role", "admin");
+          window.location.href = "./home/"; // 관리자 → 홈
+        } else if (userEmail === "manager1@cafebless.com") {
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("role", "manager");
+          window.location.href = "./home/"; // 매니저도 홈
+        } else {
+          alert("권한이 없는 사용자입니다。");
+        }
+      })
+      .catch((error) => {
+        // 로그인 실패
+        alert("ログイン失敗: " + error.message);
+      });
   });
 });
