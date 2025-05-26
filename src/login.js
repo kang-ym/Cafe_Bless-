@@ -1,67 +1,53 @@
+'use strict';
 
-import { database } from './firebase-init.js';
+window.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById("loginBtn");
+  const loginInput = document.getElementById("passwordInput");
+  const loginBox = document.querySelector(".login-container");
+  const loginCloseBtn = document.querySelector(".login-close-btn");
+  const managerBtn = document.querySelector(".manager-btn");
 
-// ✅ Firebase SDK 모듈 import (최상단에만 위치 가능)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import {
-  getDatabase,
-  ref,
-  set
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+  // ✅ index.html 등에서 login 관련 요소가 없을 수 있으므로 조건 체크
+  if (!loginBtn || !loginInput || !loginBox || !managerBtn) return;
 
-// ✅ Firebase 프로젝트 설정 (자신의 firebaseConfig로 대체 가능)
-const firebaseConfig = {
-  apiKey: "AIzaSyAjosiHexyZJWx8YS9M6D2sMDhAUtoGuT8",
-  authDomain: "cafe-bless.firebaseapp.com",
-  databaseURL: "https://cafe-bless-default-rtdb.firebaseio.com",
-  projectId: "cafe-bless",
-  storageBucket: "cafe-bless.firebasestorage.app",
-  messagingSenderId: "338610796982",
-  appId: "1:338610796982:web:1c7697bf5d25a77ea6a917",
-  measurementId: "G-NK8GRG23T9"
-};
+  // ✅ 로그인 창 열기 / 로그아웃
+  managerBtn.addEventListener("click", () => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
 
-// ✅ DOM이 완전히 로드된 후에 실행 (DOM 요소를 안전하게 다루기 위해)
-document.addEventListener("DOMContentLoaded", () => {
-  // ✅ Firebase 앱 및 서비스 초기화
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const database = getDatabase(app);
+    if (isLoggedIn === "true") {
+      // ✅ 로그아웃 처리
+      localStorage.removeItem("isLoggedIn");
+      alert("ログアウトしました。");
+      window.location.href = "index.html";
+      managerBtn.textContent = "Manager Login";
+      loginInput.value = "";
+      location.reload();
+    } else {
+      // ✅ 로그인 창 열기
+      loginBox.style.display = "flex";
+      loginInput.focus();
+    }
+  });
 
-  // ✅ 로그인 폼 및 입력 요소 가져오기
-  const loginForm = document.getElementById("loginForm");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
+  // ✅ 로그인 창 닫기
+  if (loginCloseBtn) {
+    loginCloseBtn.addEventListener("click", () => {
+      loginBox.style.display = "none";
+      loginInput.value = "";
+    });
+  }
 
-  // ✅ 로그인 폼 제출 이벤트 처리
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault(); // 기본 제출 동작 방지
-
-    const email = emailInput.value.trim();   // 입력한 이메일
-    const password = passwordInput.value;    // 입력한 비밀번호
-
-    // ✅ Firebase 이메일/비밀번호 로그인 시도
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-
-        // ✅ 로그인 성공 시, 로그인 기록을 DB에 저장
-        const loginRef = ref(database, "logins/" + user.uid);
-        set(loginRef, {
-          email: user.email,
-          timestamp: new Date().toISOString()  // 현재 시간 기록
-        });
-
-        // ✅ 로그인 성공 후 메인 페이지로 이동
-        window.location.href = "/home/";
-      })
-      .catch((error) => {
-        console.error("ログインエラー:", error);
-        alert("로그イン失敗: " + error.message);  // 에러 메시지 표시
-      });
+  // ✅ 로그인 버튼 클릭
+  loginBtn.addEventListener("click", () => {
+    const password = loginInput.value;
+    if (password === "blesscafe") {
+      // ✅ 로그인 성공 처리
+      localStorage.setItem("isLoggedIn", "true");
+      alert("ログイン成功！");
+      window.location.href = "home/"; // 원하는 페이지 경로로 이동
+    } else {
+      alert("パスワードが違います。");
+      loginInput.value = "";
+    }
   });
 });

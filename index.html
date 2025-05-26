@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cafe Belss</title>
+    <title>Cafe Bless</title>
+    <!-- SEO -->
+    <meta name="title" content="Cafe Bless - オンライン注文システム">
+    <meta name="description" content="Cafe Blessはスマホで簡単に注文できる、心温まるカフェのオンライン注文サービスです。">
+    <meta name="keywords" content="カフェ, 注文, Cafe Bless, コーヒー, オンライン注文, 韓国カフェ, 日本カフェ, 카페블레스">
+    <meta name="author" content="Cafe Bless 開発チーム">
+
+    <!-- Open Graph (SNS 공유용) -->
+    <meta property="og:title" content="Cafe Bless - オンライン注文システム">
+    <meta property="og:description" content="スマホで簡単注文！Cafe Blessはやさしさと温もりのあるカフェ体験を提供します。">
+    <meta property="og:image" content="https://cafe-bless.com/img/og-image.png">
+    <meta property="og:url" content="https://cafe-bless.com">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cafe Bless - オンライン注文システム">
+    <meta name="twitter:description" content="スマホで簡単注文！やさしいカフェ体験をお届け。">
+    <meta name="twitter:image" content="https://cafe-bless.com/img/og-image.png">
+
+    <!-- Favicon (아이콘이 있다면) -->
+    <link rel="icon" href="https://cafe-bless.com/favicon.png" type="image/png">    
     <!-- googlefont -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +36,7 @@
     <!-- Firebase Database -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <!-- 공통 초기화 -->
-    <script src="./src/firebase-init.js"></script>
+    <script type="module" src="./src/firebase-init.js"></script>
     
     <!-- css -->
     <link rel="stylesheet" href="./css/style.css">
@@ -54,7 +75,7 @@
             </div>
 
             <div class="order-box">
-                <p id="orderResult">ご注文して下さい。</p>
+                <p id="orderResult">ご注文ください。</p>
             </div>
 
             <div class="coffee-container">
@@ -124,7 +145,7 @@
                             
                             <!-- 소속 선택 -->
                             <select id="group">
-                                <option value="">チームを選んでください</option>
+                                <option value="">グループ</option>
                                 <option value="信仰">信仰</option>
                                 <option value="希望">希望</option>
                                 <option value="愛">愛</option>
@@ -145,22 +166,7 @@
             </div>
 
             <button class="order-btn">注文</button>
-            <!-- login -->
-            <!-- <div class="login-container">
-                <div class="login-box">
-                    <h3 class="login-h3">Login</h3>
-                    <p class="name">Managers</p>
-                    <div class="password-box">
-                        <p>password</p>
-                            <input type="password" name="password" id="passwordInput" placeholder="パスワード入力して下さい。">
-                    </div>
-                    <button id="loginBtn">Login</button>
-                    <button class="login-close-btn">
-                        <span></span>
-                    </button>
-    
-                </div>
-            </div> -->
+
         </main>
         <!-- main -->
 

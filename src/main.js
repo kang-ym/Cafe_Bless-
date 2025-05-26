@@ -1,12 +1,14 @@
 'use strict';
 
 import { database } from './firebase-init.js';
-
-
-// ✅ GitHub Pages와 로컬 환경에 따라 이미지 경로 설정
-const imgBase = window.location.hostname.includes("github.io")
-  ? "/Cafe_Bless-/img/"
-  : "./img/";
+import {
+  ref,
+  get,
+  set,
+  push,
+  child,
+  update
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
 // ✅ 요소 선택
 const coffeeRadios = document.querySelectorAll('.coffe-box input[type="radio"]');
@@ -19,7 +21,14 @@ const quantityInput = document.getElementById('coffeeQuantity');
 const groupSelect = document.getElementById('group');
 const nameBox = document.getElementById('nameBox');
 
-// ✅ 오늘 날짜 설정 (Firebase-safe + 사용자 표시)
+// ✅ 일본어 → Firebase 키
+const groupMap = {
+  '信仰': 'trust',
+  '希望': 'desire',
+  '愛': 'love',
+  'guest': 'guest'
+};
+
 const today = new Date();
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -28,7 +37,7 @@ const firebaseDate = `${year}_${month}_${date}`;
 const displayDate = `${year}.${month}.${date}`;
 document.getElementById('getdate').textContent = displayDate;
 
-// ✅ 커피 이미지 선택 시 시각적 강조
+// ✅ 선택된 커피 시각 강조
 function updateCoffeeSelection() {
   coffeeRadios.forEach((radio, index) => {
     imgBoxes[index].style.boxShadow = radio.checked
@@ -37,14 +46,12 @@ function updateCoffeeSelection() {
   });
 }
 
-// ✅ 온도 선택 스타일 갱신
 function updateHotColdSelection() {
   document.querySelectorAll('.hot-radio label').forEach(label => label.classList.remove('active'));
   const selected = document.querySelector('.hot-radio input:checked');
   if (selected) selected.nextElementSibling.classList.add('active');
 }
 
-// ✅ 사이즈 선택 스타일 갱신
 function updateSizeSelection() {
   document.querySelectorAll('.size-radio label').forEach(label => label.classList.remove('active'));
   const selected = document.querySelector('.size-radio input:checked');
@@ -53,7 +60,6 @@ function updateSizeSelection() {
 
 let isFirstOrder = true;
 
-// ✅ 주문 버튼 클릭 시 동작
 function handleOrder() {
   const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
   if (!selectedCoffee) {
@@ -96,6 +102,9 @@ function handleOrder() {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  const groupJp = groupSelect.value;
+  const group = groupMap[groupJp];
+
   const orderData = {
     timestamp: new Date().toISOString(),
     today: firebaseDate,
@@ -106,7 +115,7 @@ function handleOrder() {
     temperature: hotOrCold,
     quantity,
     name,
-    group: groupSelect.value,
+    group,
     price: totalPrice
   };
 
@@ -118,15 +127,15 @@ function handleOrder() {
   });
 }
 
-// ✅ 고객 이름 가져오기
 function getCustomerName() {
   const input = nameBox.querySelector('#customerName');
   return input ? input.value.trim() : '';
 }
 
-// ✅ 소속에 따른 이름 불러오기
+// ✅ 이름 로딩 (v9 호환) 🔧 수정됨
 function loadNamesByGroup(group) {
   nameBox.innerHTML = '';
+
   if (group === 'guest') {
     const input = document.createElement('input');
     input.type = 'text';
@@ -135,8 +144,9 @@ function loadNamesByGroup(group) {
     nameBox.appendChild(input);
     return;
   }
-  const ref = database.ref(`ledger/${group}`);
-  ref.once('value').then(snapshot => {
+
+  const groupRef = ref(database, `ledger/${group}`);
+  get(groupRef).then(snapshot => {
     const data = snapshot.val();
     if (!data) return;
 
@@ -159,50 +169,52 @@ function loadNamesByGroup(group) {
   });
 }
 
-// ✅ 가계부 잔액 차감 처리
+// ✅ 잔액 차감 (v9 호환) 🔧 수정됨
 function deductLedger(orderData) {
   const { group, name, price, today } = orderData;
-  const ledgerRef = database.ref(`ledger/${group}/${name}`);
-  const balanceRef = ledgerRef.child('balance');
-  const recordsRef = ledgerRef.child('records');
 
-  return balanceRef.once('value').then(snapshot => {
+  const balanceRef = ref(database, `ledger/${group}/${name}/balance`);
+  const recordsRef = ref(database, `ledger/${group}/${name}/records/${today}`);
+
+  return get(balanceRef).then(snapshot => {
     const current = snapshot.val() || 0;
     const newBalance = current - price;
-    balanceRef.set(newBalance);
 
-    return recordsRef.child(today).once('value').then(rs => {
-      let list = rs.val();
-      if (!Array.isArray(list)) list = [];
-      list.push(-price);
-      return recordsRef.child(today).set(list);
+    return set(balanceRef, newBalance).then(() => {
+      return get(recordsRef).then(rs => {
+        let list = rs.val();
+        if (!Array.isArray(list)) list = [];
+        list.push(-price);
+        return set(recordsRef, list);
+      });
     });
   });
 }
 
-// ✅ 주문 정보 Firebase 저장
+// ✅ 주문 저장 (v9 호환) 🔧 수정됨
 function saveOrderToFirebase(orderData) {
-  const newRef = database.ref('orders').push();
-  newRef.set(orderData)
+  const newOrderRef = push(ref(database, 'orders'));
+  set(newOrderRef, orderData)
     .then(() => console.log("✅ 주문 저장 완료"))
     .catch(err => console.error("❌ 주문 저장 실패:", err));
 }
 
-// ✅ 이벤트 리스너
+// ✅ 리스너 설정
 coffeeRadios.forEach(radio => radio.addEventListener('change', updateCoffeeSelection));
 hotRadios.forEach(radio => radio.addEventListener('change', updateHotColdSelection));
 sizeRadios.forEach(radio => radio.addEventListener('change', updateSizeSelection));
-orderBtn.addEventListener('click', handleOrder);
+
 groupSelect.addEventListener('change', () => {
-  const selectedGroup = groupSelect.value;
-  loadNamesByGroup(selectedGroup);
+  const groupJp = groupSelect.value;
+  const group = groupMap[groupJp];
+  loadNamesByGroup(group);
 });
 
-// ✅ 초기 로드
 window.addEventListener('DOMContentLoaded', () => {
   updateCoffeeSelection();
   updateHotColdSelection();
   updateSizeSelection();
-  const selectedGroup = groupSelect.value;
-  if (selectedGroup) loadNamesByGroup(selectedGroup);
+  const groupJp = groupSelect.value;
+  const group = groupMap[groupJp];
+  if (group) loadNamesByGroup(group);
 });
