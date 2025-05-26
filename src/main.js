@@ -202,6 +202,7 @@ groupSelect.addEventListener('change', () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+  orderBtn.addEventListener('click', handleOrder);
   updateCoffeeSelection();
   updateHotColdSelection();
   updateSizeSelection();
