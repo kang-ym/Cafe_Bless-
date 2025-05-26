@@ -128,7 +128,7 @@ function getCustomerName() {
 function loadNamesByGroup(group) {
   nameBox.innerHTML = '';
 
-  if (group === 'ゲスト') {
+  if (group === 'guest') {
     const input = document.createElement('input');
     input.type = 'text';
     input.id = 'customerName';
