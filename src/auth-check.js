@@ -12,6 +12,13 @@ onAuthStateChanged(auth, user => {
   const email = user.email;
   const path = window.location.pathname;
 
+  // 이메일 표시용 요소
+  const userEmailDisplay = document.getElementById('userEmail');
+  if (userEmailDisplay) {
+    userEmailDisplay.textContent = email;
+  }
+
+
   // 🔐 관리자 계정
   const isAdmin = email === "admin@cafebless.com";
   // 🔐 매니저 계정
