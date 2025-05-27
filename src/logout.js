@@ -14,7 +14,7 @@ if (logoutBtn) {
         // ✅ 로그아웃 성공 시
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("role");
-        alert("ログアウトしました。");
+
 
         // ✅ 로그인 페이지나 메인으로 이동
         const basePath = window.location.hostname.includes("github.io")

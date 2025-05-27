@@ -42,7 +42,20 @@
       margin-bottom: 80px;
       color: #333;
     }
-
+    form{
+      position: relative;
+    }
+    label{
+      position: absolute;
+      bottom: 7.3rem;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+    }
+    #saveEmailCheckbox{
+      width: 15px;
+    }
     @media (width < 768px){
       body{
         display: block;
@@ -77,6 +90,9 @@
     <input type="email" id="email" placeholder="Email"><br />
     <input type="password" id= "passwordInput" placeholder="Password"><br />
     <button type="button" id="loginBtn">ログイン</button>
+    <label>
+      <input type="checkbox" id="saveEmailCheckbox"> メールアドレスを保存
+    </label>
   </form>
 </body>
 </html>
