@@ -10,37 +10,50 @@ window.addEventListener('DOMContentLoaded', () => {
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("passwordInput");
 
-  // 버튼이나 input 요소가 없는 경우 종료
+  const saveEmailCheckbox = document.getElementById("saveEmailCheckbox");
+
+  // ✅ 저장된 이메일이 있다면 입력창에 표시
+  const savedEmail = localStorage.getItem("savedEmail");
+  if (savedEmail) {
+    emailInput.value = savedEmail;
+    if (saveEmailCheckbox) saveEmailCheckbox.checked = true;
+  }
+
   if (!loginBtn || !emailInput || !passwordInput) return;
 
-  // 로그인 버튼 클릭 시 동작
+  // ✅ 로그인 버튼 클릭 시
   loginBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // 폼 기본 제출 방지
+    e.preventDefault();
 
     const email = emailInput.value.trim();
     const password = passwordInput.value;
 
-    // Firebase 인증 시도
+    // ✅ 이메일 저장 여부에 따라 저장 또는 삭제
+    if (saveEmailCheckbox && saveEmailCheckbox.checked) {
+      localStorage.setItem("savedEmail", email);
+    } else {
+      localStorage.removeItem("savedEmail");
+    }
+
+    // ✅ Firebase 인증
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         const userEmail = user.email;
 
-        // ✅ 권한 분기
         if (userEmail === "admin@cafebless.com") {
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("role", "admin");
-          window.location.href = "./home/"; // 관리자 → 홈
+          window.location.href = "./home/";
         } else if (userEmail === "manager1@cafebless.com") {
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("role", "manager");
-          window.location.href = "./home/"; // 매니저도 홈
+          window.location.href = "./home/";
         } else {
           alert("권한이 없는 사용자입니다。");
         }
       })
       .catch((error) => {
-        // 로그인 실패
         alert("ログイン失敗: " + error.message);
       });
   });
