@@ -18,7 +18,7 @@ if (logoutBtn) {
 
         // ✅ 로그인 페이지나 메인으로 이동
         const basePath = window.location.hostname.includes("github.io")
-          ? "/Cafe_Bless-"
+          ? "./index.html"
           : "";
 
         window.location.href = `${basePath}/index.html`;
