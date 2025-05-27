@@ -40,6 +40,7 @@
       border: 1px solid transparent;
       background-color: #fcc7c7;
       margin-bottom: 80px;
+      color: #333;
     }
 
     @media (width < 768px){
@@ -53,6 +54,17 @@
         left: 50%;
         transform: translate(-50%, -50%);
         width: 60%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        >h2{
+          margin-bottom: 10px;
+        }
+        >input{
+          margin: 0;
+        }
       }
 
     }

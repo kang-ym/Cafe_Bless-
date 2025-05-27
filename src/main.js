@@ -83,7 +83,7 @@ function handleOrder() {
   const pricePerCup = parseInt(priceElement.dataset[`price${size.toLowerCase()}`], 10);
   const totalPrice = pricePerCup * quantity;
 
-  const summary = `注文者: ${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, 合計: ${totalPrice}円`;
+  const summary = `${name}, ${coffeeLabel}, ${size}size, ${hotOrCold}, ${quantity}杯, ${totalPrice}円`;
   if (isFirstOrder) {
     orderResult.textContent = `\n- ${summary}`;
     orderBtn.textContent = '注文追加';
