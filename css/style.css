@@ -785,34 +785,38 @@ nav{
   /* -------------------------------------------------- */
   
   .lunch-ledger-main {
-    padding: 16px;
+    margin-bottom: 10px;
   }
   
   .lunch-ledger-section {
     background-color: #fff;
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
   .lunch-ledger-section > h2 {
     margin-bottom: 10px;
+    border-left: 4px solid var(--color-accent);
+    padding-left: 5px;
   }
   
   .lunch-ledger-tab {
     display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
     align-items: center;
   }
   
   .lunch-ledger-tab a {
-    padding: 6px 14px;
+    padding: 6px 10px;
     background-color: #e3f2fd;
     color: #333;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 500;
+    font-size: 16px;
     transition: background-color 0.2s;
   }
   
@@ -897,6 +901,10 @@ nav{
   #lunch-ledger-btn-add-person:hover {
     background-color: #1976d2;
   }
+  .charge-input{
+    min-width: 100px;
+  }
+
   
   /* ✅ 선택/삭제 버튼 스타일 (Lunch Ledger용) */
   #lunch-ledger-btn-select,
