@@ -616,22 +616,27 @@ nav{
 
   .ledger-section h2 {
     margin-bottom: 10px;
+    border-left: 4px solid var(--color-accent);
+    padding-left: 5px;
   }
   
   .cafe-ledger-tab {
     display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
     align-items: center;
   }
   
   .cafe-ledger-tab a {
-    padding: 6px 14px;
+    padding: 6px 10px;
     background-color: #e3f2fd;
     color: #333;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 500;
+    font-size: 16px;
+    text-align: center;
     transition: background-color 0.2s;
   }
   
@@ -702,19 +707,44 @@ nav{
   }
   
   .ledger-main {
-    padding: 16px;
+    padding: 0;
+    margin-bottom: 10px;
   }
   
   .ledger-section {
     background-color: #fff;
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
   .ledger-table-container {
     overflow-x: auto;
   }
+
+  /* ✅ 이름 칸 넓히기 (1열) */
+.ledger-table td.ledger-name,
+.ledger-table th.ledger-name {
+  min-width: 100px;
+  padding-left: 10px;
+  text-align: center;
+}
+
+/* ✅ 잔액 칸 넓히기 (2열) */
+.ledger-table td:nth-child(2),
+.ledger-table th:nth-child(2) {
+  min-width: 70px;
+}
+
+/* ✅ 충전 칸 넓히기 (3열) */
+.ledger-table th:nth-child(3){
+  font-size: 13px;
+}
+.ledger-table td:nth-child(3),
+.ledger-table th:nth-child(3) {
+  min-width: 70px;
+}
+
   
   /* ✅ 선택/삭제 버튼 스타일 (Cafe Ledger용) */
   #ledger-btn-select,

@@ -52,7 +52,7 @@ function renderLedger(groupName) {
     const ledgerTableHead = document.getElementById('ledger-table-head-row');
     ledgerTableHead.innerHTML = `
       ${selectionMode ? '<th></th>' : ''}
-      ${groupName === 'guest' ? '<th class="cafe-ledger-col">소속</th>' : ''}
+
       <th class="cafe-ledger-col">名前</th>
       <th class="cafe-ledger-col">残高</th>
       <th class="cafe-ledger-col">チャージ</th>
@@ -73,7 +73,7 @@ function renderLedger(groupName) {
         rowHtml += `<td><input type="checkbox" class="ledger-select-box" data-name="${personName}" data-group="${groupName}"></td>`;
       }
       if (groupName === 'guest') {
-        rowHtml += `<td class="cafe-ledger-col">ゲスト</td>`;
+        // rowHtml += `<td class="cafe-ledger-col">ゲスト</td>`;
         rowHtml += `<td class="cafe-ledger-col"><input type="text" class="edit-name" value="${personName}" data-old="${personName}"></td>`;
       } else {
         rowHtml += `<td class="cafe-ledger-col">${personName}</td>`;
@@ -173,6 +173,28 @@ function renderLedger(groupName) {
   });
 }
 
+function applyLedgerNameClass() {
+  const rows = document.querySelectorAll('.ledger-table tbody tr');
+  rows.forEach(row => {
+    const tds = row.querySelectorAll('td');
+    tds.forEach(td => td.classList.remove('ledger-name'));
+
+    if (selectionMode) {
+      tds[1]?.classList.add('ledger-name'); // 선택 모드: 이름은 두 번째 열
+    } else {
+      tds[0]?.classList.add('ledger-name'); // 기본 모드: 이름은 첫 번째 열
+    }
+  });
+
+  const ths = document.querySelectorAll('#ledger-table-head-row th');
+  ths.forEach(th => th.classList.remove('ledger-name'));
+  if (selectionMode) {
+    ths[1]?.classList.add('ledger-name');
+  } else {
+    ths[0]?.classList.add('ledger-name');
+  }
+}
+
 // ✅ 탭 클릭 시 그룹 변경
 const cafeLedgerTabs = document.querySelectorAll('.cafe-ledger-tab a');
 cafeLedgerTabs.forEach(tab => {
@@ -214,6 +236,7 @@ selectBtn.addEventListener('click', () => {
   const group = activeTab?.dataset.group || 'trust';
   deleteSelectedBtn.style.display = selectionMode ? 'inline-block' : 'none';
   renderLedger(group);
+  applyLedgerNameClass(); 
 });
 
 deleteSelectedBtn.addEventListener('click', () => {
