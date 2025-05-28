@@ -1062,6 +1062,15 @@ nav{
     min-width: 100px;
   }
 
+/* 이름 열 기본 스타일 (선택 모드 아님) */
+.lunch-ledger-table th.lunch-ledger-name,
+.lunch-ledger-table td.lunch-ledger-name {
+  min-width: 70px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+
   
   /* ✅ 선택/삭제 버튼 스타일 (Lunch Ledger용) */
   #lunch-ledger-btn-select,

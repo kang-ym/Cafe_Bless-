@@ -1,189 +1,194 @@
 'use strict';
 
-// ✅ compat 방식에서 설정된 database 사용
-const database = window.database;
-const lunchLedgerRef = database.ref('lunchLedger');
+import { ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+import { database as db } from './firebase-init.js';
 
-// ✅ 인증 완료 후 실행을 보장
-firebase.auth().onAuthStateChanged(user => {
-  if (!user) {
-    alert("ログインが必要です。");
-    window.location.href = "../index.html";
-    return;
-  }
+const tableHead = document.getElementById('lunch-ledger-table-head-row');
+const tableBody = document.getElementById('lunch-ledger-table-body');
+const tabLinks = document.querySelectorAll('.lunch-ledger-tab a');
+const addPersonBtn = document.getElementById('lunch-ledger-btn-add-person');
+const selectBtn = document.getElementById('lunch-ledger-btn-select');
+const deleteBtn = document.getElementById('lunch-ledger-btn-delete');
 
-  if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', initLunchLedger);
-  } else {
-    initLunchLedger();
-  }
-});
+let currentGroup = '信仰';
+let selectionMode = false;
 
-function initLunchLedger() {
-  const tabs = document.querySelectorAll(".lunch-ledger-tab a");
-  const addBtn = document.getElementById("lunch-ledger-btn-add-person");
-  const selectBtn = document.getElementById("lunch-ledger-btn-select");
-  const deleteBtn = document.getElementById("lunch-ledger-btn-delete");
+function getTodayKey() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  return `${yyyy}_${mm}_${dd}`;
+}
 
-  let currentGroup = document.querySelector(".lunch-ledger-tab a.active")?.dataset.group || '信仰';
-  renderLunchLedger(currentGroup);
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", e => {
-      e.preventDefault();
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      currentGroup = tab.dataset.group;
-      renderLunchLedger(currentGroup);
-    });
-  });
-
-  addBtn.addEventListener("click", () => {
-    const name = prompt("名前を入力してください:");
-    if (!name) return;
-    const amount = parseInt(prompt("初期金額を入力してください:", "0"));
-    if (isNaN(amount)) return;
-
-    lunchLedgerRef.child(currentGroup).child(name).set({
-      balance: amount,
-      records: {}
-    }).then(() => renderLunchLedger(currentGroup));
-  });
-
-  selectBtn.addEventListener("click", () => {
-    const headRow = document.getElementById("lunch-ledger-table-head-row");
-    if (!document.querySelector(".checkbox-head")) {
-      headRow.innerHTML = `<th class="checkbox-head"></th>` + headRow.innerHTML;
-    }
-
-    document.querySelectorAll("#lunch-ledger-table-body tr").forEach(row => {
-      const checkboxCell = document.createElement("td");
-      checkboxCell.className = "checkbox-col";
-      checkboxCell.innerHTML = `<input type="checkbox" class="lunch-ledger-select-box">`;
-      row.prepend(checkboxCell);
-    });
-
-    deleteBtn.style.display = "inline-block";
-  });
-
-  deleteBtn.addEventListener("click", () => {
-    const checkboxes = document.querySelectorAll(".lunch-ledger-select-box:checked");
-    checkboxes.forEach(box => {
-      const name = box.closest("tr").dataset.name;
-      lunchLedgerRef.child(currentGroup).child(name).remove();
-    });
-
-    deleteBtn.style.display = "none";
-    renderLunchLedger(currentGroup);
-  });
+function formatDisplayDate(dateKey) {
+  return dateKey.replace(/_/g, '.');
 }
 
 function renderLunchLedger(group) {
-  const tbody = document.getElementById("lunch-ledger-table-body");
-  const thead = document.getElementById("lunch-ledger-table-head-row");
+  const groupRef = ref(db, `lunchLedger/${group}`);
+  onValue(groupRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    const allDates = collectAllDates(data);
 
-  tbody.innerHTML = '';
-  thead.innerHTML = '';
+    renderHead(allDates);
+    renderBody(data, allDates, group);
+    applyLunchLedgerNameClass();
+  });
+}
 
-  lunchLedgerRef.child(group).once('value').then(snapshot => {
-    const data = snapshot.val();
-    if (!data) return;
+function renderHead(allDates) {
+  tableHead.innerHTML = `
+    ${selectionMode ? '<th></th>' : ''}
+    <th class="lunch-ledger-name">名前</th>
+    <th>残高</th>
+    <th>チャージ</th>
+    ${allDates.map(date => `<th>${formatDisplayDate(date)}</th>`).join('')}
+  `;
+}
 
-    const dateSet = new Set();
-    Object.values(data).forEach(person => {
-      if (person.records) {
-        Object.keys(person.records).forEach(date => dateSet.add(date));
+function renderBody(data, allDates, group) {
+  tableBody.innerHTML = '';
+
+  Object.entries(data).forEach(([name, info]) => {
+    const tr = document.createElement('tr');
+    tr.className = 'lunch-ledger-row';
+
+    const balance = info.balance || 0;
+    const balanceClass = balance <= 200 ? 'lunch-ledger-balance low' : 'lunch-ledger-balance';
+
+    const cells = [];
+
+    if (selectionMode) {
+      cells.push(`<td><input type="checkbox" class="lunch-ledger-select-box" data-name="${name}"></td>`);
+    }
+
+    cells.push(`<td>${name}</td>`);
+    cells.push(`<td class="${balanceClass}">${balance}</td>`);
+    cells.push(`
+      <td>
+        <input type="number" class="lunch-ledger-input charge-input" placeholder="金額">
+        <button class="lunch-ledger-charge" data-name="${name}" data-group="${group}">チャージ</button>
+        <button class="lunch-ledger-confirm" data-name="${name}" data-group="${group}">-200</button>
+      </td>
+    `);
+
+    allDates.forEach(date => {
+      const entries = (info.records?.[date]) || [];
+      const display = entries.map(v => `${v > 0 ? '+' : ''}${v}`).join('<br>');
+      cells.push(`<td>${display}</td>`);
+    });
+
+    tr.innerHTML = cells.join('');
+    tableBody.appendChild(tr);
+  });
+
+  attachEventHandlers(group);
+}
+
+function collectAllDates(data) {
+  const dateSet = new Set();
+  Object.values(data).forEach(info => {
+    Object.keys(info.records || {}).forEach(date => {
+      dateSet.add(date);
+    });
+  });
+
+  return [...dateSet].sort((a, b) => b.localeCompare(a));
+}
+
+function attachEventHandlers(group) {
+  document.querySelectorAll('.lunch-ledger-charge').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.name;
+      const input = btn.previousElementSibling;
+      const amount = parseInt(input.value);
+      if (!amount) {
+        alert('金額を入力してください。');
+        return;
       }
-    });
 
-    const sortedDates = Array.from(dateSet).sort((a, b) => b.localeCompare(a));
-    const displayDates = sortedDates.map(d => d.replace(/_/g, '.'));
+      const today = getTodayKey();
+      const userRef = ref(db, `lunchLedger/${group}/${name}`);
 
-    thead.innerHTML = `
-      <th>名前</th>
-      <th>残高</th>
-      <th>チャージ</th>
-      ${displayDates.map(date => `<th>${date}</th>`).join('')}
-    `;
-
-    Object.entries(data).forEach(([name, info]) => {
-      const row = document.createElement("tr");
-      row.dataset.name = name;
-
-      const balance = info.balance || 0;
-      const balanceClass = balance <= 200 ? "low" : "";
-      const records = info.records || {};
-
-      const cells = sortedDates.map(date => {
-        const entry = records[date];
-        if (!entry) return `<td></td>`;
-        if (Array.isArray(entry)) {
-          return `<td>${entry.map(n => `${n > 0 ? '+' : ''}${n}`).join('<br>')}</td>`;
-        } else if (typeof entry === 'object') {
-          return `<td>${Object.values(entry).map(n => `${n > 0 ? '+' : ''}${n}`).join('<br>')}</td>`;
-        } else {
-          return `<td>${entry > 0 ? '+' : ''}${entry}</td>`;
-        }
-      }).join('');
-
-      row.innerHTML = `
-        <td>${name}</td>
-        <td class="lunch-ledger-balance ${balanceClass}">${balance}</td>
-        <td>
-          <input type="number" class="charge-input" placeholder="金額">
-          <button class="charge-btn">確認</button>
-          <button class="pay-btn">−200</button>
-        </td>
-        ${cells}
-      `;
-
-      tbody.appendChild(row);
-    });
-
-    // ✅ 차감 버튼 기능
-    document.querySelectorAll(".pay-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const row = btn.closest("tr");
-        const name = row.dataset.name;
-        const today = new Date().toISOString().slice(0, 10).replace(/-/g, '_');
-        const userRef = lunchLedgerRef.child(group).child(name);
-
-        userRef.child("balance").transaction(b => (b || 0) - 200);
-        userRef.child("records").child(today).once("value").then(snap => {
-          const current = snap.val();
-          const next = !current ? [-200]
-            : Array.isArray(current) ? [...current, -200]
-            : [...Object.values(current), -200];
-
-          userRef.child("records").child(today).set(next);
-          renderLunchLedger(group);
-        });
+      get(userRef).then(snapshot => {
+        const data = snapshot.val() || {};
+        const newBalance = (data.balance || 0) + amount;
+        const records = data.records || {};
+        records[today] = [...(records[today] || []), amount];
+        set(userRef, { balance: newBalance, records });
+        input.value = '';
       });
     });
+  });
 
-    // ✅ 충전 버튼 기능
-    document.querySelectorAll(".charge-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const row = btn.closest("tr");
-        const name = row.dataset.name;
-        const input = row.querySelector(".charge-input");
-        const amount = parseInt(input.value);
-        if (isNaN(amount) || amount <= 0) return;
+  document.querySelectorAll('.lunch-ledger-confirm').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.name;
+      const amount = -200;
+      const today = getTodayKey();
+      const userRef = ref(db, `lunchLedger/${group}/${name}`);
 
-        const today = new Date().toISOString().slice(0, 10).replace(/-/g, '_');
-        const userRef = lunchLedgerRef.child(group).child(name);
-
-        userRef.child("balance").transaction(b => (b || 0) + amount);
-        userRef.child("records").child(today).once("value").then(snap => {
-          const current = snap.val();
-          const next = !current ? [amount]
-            : Array.isArray(current) ? [...current, amount]
-            : [...Object.values(current), amount];
-
-          userRef.child("records").child(today).set(next);
-          renderLunchLedger(group);
-        });
+      get(userRef).then(snapshot => {
+        const data = snapshot.val() || {};
+        const newBalance = (data.balance || 0) + amount;
+        const records = data.records || {};
+        records[today] = [...(records[today] || []), amount];
+        set(userRef, { balance: newBalance, records });
       });
     });
   });
 }
+
+function applyLunchLedgerNameClass() {
+  const rows = document.querySelectorAll('.lunch-ledger-table tbody tr');
+  rows.forEach(row => {
+    const tds = row.querySelectorAll('td');
+    tds.forEach(td => td.classList.remove('lunch-ledger-name'));
+    const index = selectionMode ? 1 : 0;
+    tds[index]?.classList.add('lunch-ledger-name');
+  });
+
+  const ths = document.querySelectorAll('#lunch-ledger-table-head-row th');
+  ths.forEach(th => th.classList.remove('lunch-ledger-name'));
+  const index = selectionMode ? 1 : 0;
+  ths[index]?.classList.add('lunch-ledger-name');
+}
+
+// 이벤트 등록
+selectBtn.addEventListener('click', () => {
+  selectionMode = !selectionMode;
+  deleteBtn.style.display = selectionMode ? 'inline-block' : 'none';
+  renderLunchLedger(currentGroup);
+});
+
+deleteBtn.addEventListener('click', () => {
+  const checked = document.querySelectorAll('.lunch-ledger-select-box:checked');
+  checked.forEach(box => {
+    const name = box.dataset.name;
+    set(ref(db, `lunchLedger/${currentGroup}/${name}`), null);
+  });
+});
+
+addPersonBtn.addEventListener('click', () => {
+  const name = prompt('名前を入力してください：');
+  if (!name) return;
+  const today = getTodayKey();
+  set(ref(db, `lunchLedger/${currentGroup}/${name}`), {
+    balance: 0,
+    records: { [today]: [0] }
+  });
+});
+
+tabLinks.forEach(tab => {
+  tab.addEventListener('click', (e) => {
+    e.preventDefault();
+    tabLinks.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentGroup = tab.dataset.group;
+    renderLunchLedger(currentGroup);
+  });
+});
+
+// ✅ 초기 표시
+renderLunchLedger(currentGroup);
