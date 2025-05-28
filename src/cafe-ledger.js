@@ -1,4 +1,7 @@
+'use strict';
 
+// ✅ compat 방식 사용 (firebase-init.js에서 window.database 설정됨)
+const database = window.database;
 
 // ✅ 선택 삭제 관련 요소
 const ledgerTableBody = document.getElementById('ledger-table-body');
@@ -52,7 +55,6 @@ function renderLedger(groupName) {
     const ledgerTableHead = document.getElementById('ledger-table-head-row');
     ledgerTableHead.innerHTML = `
       ${selectionMode ? '<th></th>' : ''}
-
       <th class="cafe-ledger-col">名前</th>
       <th class="cafe-ledger-col">残高</th>
       <th class="cafe-ledger-col">チャージ</th>
@@ -72,8 +74,8 @@ function renderLedger(groupName) {
       if (selectionMode) {
         rowHtml += `<td><input type="checkbox" class="ledger-select-box" data-name="${personName}" data-group="${groupName}"></td>`;
       }
+
       if (groupName === 'guest') {
-        // rowHtml += `<td class="cafe-ledger-col">ゲスト</td>`;
         rowHtml += `<td class="cafe-ledger-col"><input type="text" class="edit-name" value="${personName}" data-old="${personName}"></td>`;
       } else {
         rowHtml += `<td class="cafe-ledger-col">${personName}</td>`;
@@ -157,13 +159,11 @@ function renderLedger(groupName) {
         moveBtn.addEventListener('click', () => {
           const newGroup = row.querySelector('.move-group').value;
           const ref = database.ref(`ledger`);
-
           ref.child('guest').child(personName).once('value').then(snapshot => {
             const data = snapshot.val();
             if (!data) return;
             ref.child(newGroup).child(personName).set(data);
             ref.child('guest').child(personName).remove();
-
             renderLedger('guest');
             renderLedger(newGroup);
           });
@@ -178,11 +178,10 @@ function applyLedgerNameClass() {
   rows.forEach(row => {
     const tds = row.querySelectorAll('td');
     tds.forEach(td => td.classList.remove('ledger-name'));
-
     if (selectionMode) {
-      tds[1]?.classList.add('ledger-name'); // 선택 모드: 이름은 두 번째 열
+      tds[1]?.classList.add('ledger-name');
     } else {
-      tds[0]?.classList.add('ledger-name'); // 기본 모드: 이름은 첫 번째 열
+      tds[0]?.classList.add('ledger-name');
     }
   });
 
@@ -196,11 +195,10 @@ function applyLedgerNameClass() {
 }
 
 // ✅ 탭 클릭 시 그룹 변경
-const cafeLedgerTabs = document.querySelectorAll('.cafe-ledger-tab a');
-cafeLedgerTabs.forEach(tab => {
+document.querySelectorAll('.cafe-ledger-tab a').forEach(tab => {
   tab.addEventListener('click', e => {
     e.preventDefault();
-    cafeLedgerTabs.forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.cafe-ledger-tab a').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     const group = tab.dataset.group;
     renderLedger(group);
@@ -236,13 +234,12 @@ selectBtn.addEventListener('click', () => {
   const group = activeTab?.dataset.group || 'trust';
   deleteSelectedBtn.style.display = selectionMode ? 'inline-block' : 'none';
   renderLedger(group);
-  applyLedgerNameClass(); 
+  applyLedgerNameClass();
 });
 
 deleteSelectedBtn.addEventListener('click', () => {
   const checkboxes = document.querySelectorAll('.ledger-select-box:checked');
   if (checkboxes.length === 0) return alert('削除する人を選択してください');
-
   if (!confirm('選択したメンバーを全て削除しますか？')) return;
 
   checkboxes.forEach(cb => {
@@ -255,19 +252,12 @@ deleteSelectedBtn.addEventListener('click', () => {
 });
 
 // ✅ 페이지 처음 로딩 시 기본 그룹(信仰) 자동 표시
-window.addEventListener('DOMContentLoaded', () => {
-  const defaultGroup = "信仰";
-
-  // 기본 탭 활성화
-  document.querySelectorAll(".cafe-ledger-tab a").forEach(tab => {
-    if (tab.dataset.group === defaultGroup) {
-      tab.classList.add("active");
-    } else {
-      tab.classList.remove("active");
-    }
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => {
+    renderLedger("信仰");
+    applyLedgerNameClass();
   });
-
-  // 가계부 렌더링
-  renderLedger(defaultGroup);
+} else {
+  renderLedger("信仰");
   applyLedgerNameClass();
-});
+}
