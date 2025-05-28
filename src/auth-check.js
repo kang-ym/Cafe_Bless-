@@ -4,6 +4,37 @@ import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.22.1
 const auth = getAuth();
 const db = getDatabase();
 
+const loadingScreen = document.getElementById("loadingScreen");
+
+// 🔽 초기엔 로딩 화면 보여줌
+if (loadingScreen) loadingScreen.style.display = "flex";
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert("ログインが必要です。");
+    window.location.href = "./index.html";
+    return;
+  }
+
+  try {
+    const userRef = ref(db, `users/${user.uid}`);
+    const snapshot = await get(userRef);
+
+    if (!snapshot.exists()) throw new Error("권한 정보 없음");
+
+    // ... 닉네임, role 확인 처리
+
+    // ✅ 로딩 완료 후 숨김
+    if (loadingScreen) loadingScreen.style.display = "none";
+
+  } catch (err) {
+    alert("認証エラー: " + err.message);
+    window.location.href = "./index.html";
+  }
+});
+
+
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("ログインが必要です。");
