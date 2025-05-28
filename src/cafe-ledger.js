@@ -253,3 +253,21 @@ deleteSelectedBtn.addEventListener('click', () => {
       .catch(err => console.error("❌ 삭제 실패:", err));
   });
 });
+
+// ✅ 페이지 처음 로딩 시 기본 그룹(信仰) 자동 표시
+window.addEventListener('DOMContentLoaded', () => {
+  const defaultGroup = "信仰";
+
+  // 기본 탭 활성화
+  document.querySelectorAll(".cafe-ledger-tab a").forEach(tab => {
+    if (tab.dataset.group === defaultGroup) {
+      tab.classList.add("active");
+    } else {
+      tab.classList.remove("active");
+    }
+  });
+
+  // 가계부 렌더링
+  renderLedger(defaultGroup);
+  applyLedgerNameClass();
+});

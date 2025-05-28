@@ -3,96 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Login</title>
-
-  <!-- Firebase 초기화 -->
-  <script type="module" src="./src/firebase-init.js"></script>
-
+  <!-- fontawesome -->
+  <script src="https://kit.fontawesome.com/fcbf2015e7.js" crossorigin="anonymous"></script>
   <!-- js -->
+  <script type="module" src="./src/firebase-init.js"></script>
   <script type="module" src="./src/login.js" defer></script>
-
-  <!-- CSS는 선택 -->
-  <style>
-    *{
-      padding: 0;
-      margin: 0;
-
-    }
-      
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-family: sans-serif; 
-      padding: 80px; 
-      text-align: center; 
-    }
-    input { 
-      padding: 8px; 
-      margin: 10px;
-      width: 250px; 
-    }
-    button {
-      padding: 10px 40px; 
-      border-radius: 16px;
-      outline: transparent;
-      border: 1px solid transparent;
-      background-color: #fcc7c7;
-      margin-bottom: 80px;
-      color: #333;
-    }
-    form{
-      position: relative;
-    }
-    label{
-      position: absolute;
-      bottom: 7.3rem;
-      right: 10px;
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-    }
-    #saveEmailCheckbox{
-      width: 15px;
-    }
-    @media (width < 768px){
-      body{
-        display: block;
-        padding: 0;
-      }
-      form {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        >h2{
-          margin-bottom: 10px;
-        }
-        >input{
-          margin: 0;
-        }
-      }
-
-    }
-  </style>
+  <script type="module" src="./src/signup.js" defer></script>
+  <!-- css -->
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-<body>
+
+<body class="login-body">
+  <div id="loginToggleButtons" class="login-toggle-buttons">
+    <button id="showLogin">ログイン</button>
+    <button id="showSignup">新規登録</button>
+    <a href="./index.html">
+      <i class="fa-solid fa-mug-saucer"></i>注文ページへ
+    </a>
+  </div>
+
+  <!-- 로그인 폼 -->
   <form id="loginForm">
-    
-    <h2>Manager Login</h2>
-    <input type="email" id="email" placeholder="Email"><br />
-    <input type="password" id= "passwordInput" placeholder="Password"><br />
+    <h2 class="login-title">Manager Login</h2>
+
+    <div class="id-box">
+      <label for="loginId">ID</label>
+      <input type="text" id="loginId" placeholder="例: admin">
+      <span>@cafebless.com</span>  
+    </div>
+    <div class="password-box">
+      <label for="passwordInput">Password</label>
+      <input type="password" id="passwordInput" placeholder="Password">
+    </div>
+    <div class="save-check-box">
+      <label for="saveEmailCheckbox" >
+        <input type="checkbox" id="saveEmailCheckbox"> メールアドレスを保存
+      </label>
+    </div>
     <button type="submit" id="loginBtn">ログイン</button>
-    <label>
-      <input type="checkbox" id="saveEmailCheckbox"> メールアドレスを保存
-    </label>
+
+  </form>
+
+  <!-- 회원가입 폼 -->
+  <form id="signupForm">
+    <h2>新規登録</h2>
+    <div class="nickname-box">
+      <label for="nickname">ニックネーム</label>
+      <input type="text" id="nickname" placeholder="ニックネーム">
+    </div>
+    <div class="signup-id-box">
+      <label for="signupId">ID</label>
+      <input type="text" id="signupId" placeholder="例: manager01">
+      <span>@cafebless.com</span>
+    </div>
+    <div class="signup-password-box">
+      <label for="signupPassword">パスワード</label>
+      <input type="password" id="signupPassword" placeholder="パスワード">
+    </div>
+    <div class="register-code-box">
+      <label for="registerCode">メニージャー<br>管理者<br>登録番号</label>
+      <input type="text" id="registerCode" placeholder="登録番号を入力">
+    </div>
+
+    <button type="submit" id="signupBtn">登録</button>
   </form>
 </body>
 </html>
