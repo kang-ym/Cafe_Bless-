@@ -608,7 +608,9 @@ h3{
   }
 }
 
-
+.admin-only {
+  display: none;
+}
 /* manager */
 
 /* Manager-header */

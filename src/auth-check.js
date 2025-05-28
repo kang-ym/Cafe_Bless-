@@ -7,47 +7,69 @@ const db = getDatabase();
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("ログインが必要です。");
-    window.location.href = "/Cafe_Bless-/login.html";
+    window.location.href = "./index.html";
     return;
   }
 
   const uid = user.uid;
   const path = window.location.pathname;
+  const userEmailDisplay = document.getElementById("userEmail");
 
-// 로그인한 사용자 닉네임 화면에 표시
-const userEmailDisplay = document.getElementById("userEmail");
+  try {
+    const userRef = ref(db, `users/${uid}`);
+    const snapshot = await get(userRef);
 
-try {
-  const userRef = ref(db, `users/${uid}`);
-  const snapshot = await get(userRef);
+    if (!snapshot.exists()) throw new Error("권한 정보 없음");
 
-  if (!snapshot.exists()) {
-    throw new Error("권한 정보 없음");
-  }
+    const data = snapshot.val();
+    const role = data.role;
+    const nickname = data.nickname;
 
-  const { role, nickname } = snapshot.val();
-
-  if (userEmailDisplay) {
-    userEmailDisplay.textContent = nickname ? `${nickname}님` : user.email;
-  }
-
-    // 🔐 권한 체크
-    if (role === "admin") {
-      // ✅ 관리자: 전체 허용
-      return;
+    // 닉네임 표시
+    if (userEmailDisplay) {
+      userEmailDisplay.textContent = nickname ? `${nickname}様` : user.email;
     }
+
+    // ✅ 네비게이션 메뉴 삽입도 여기에 위치
+    const navBox = document.querySelector(".nav-box");
+    if (navBox) {
+      const commonItems = [
+        { label: "Home", href: "../home/" },
+        { label: "Today's Orders", href: "../orders/" }
+      ];
+      const adminItems = [
+        { label: "Cafe Ledger", href: "../cafe-ledger/" },
+        { label: "Lunch Ledger", href: "../lunch-ledger/" }
+      ];
+
+      commonItems.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="${item.href}">${item.label}</a>`;
+        navBox.appendChild(li);
+      });
+
+      if (role === "admin") {
+        adminItems.forEach(item => {
+          const li = document.createElement("li");
+          li.innerHTML = `<a href="${item.href}">${item.label}</a>`;
+          navBox.appendChild(li);
+        });
+      }
+    }
+
+    // ✅ 접근 제어 (현재 페이지 기준)
+    if (role === "admin") return;
 
     if (role === "manager") {
       const isHomeOrOrdersPage = path.includes("/home") || path.includes("/orders");
       if (isHomeOrOrdersPage) return;
 
-      // ❌ 매니저지만 접근 불가
       alert("このページへのアクセス権限がありません。");
-      window.location.href = "/Cafe_Bless-/home/";
+      window.location.href = "../home/";
       return;
     }
 
-    // ❌ 정의되지 않은 사용자
+    // 알 수 없는 권한
     alert("アクセス権限がありません。");
     window.location.href = "./index.html";
 
