@@ -58,7 +58,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // 닉네임 표시
     if (userEmailDisplay) {
-      userEmailDisplay.textContent = nickname ? `${nickname}様` : user.email;
+      userEmailDisplay.textContent = nickname ? `こんにちは、${nickname}様` : user.email;
     }
 
     // ✅ 네비게이션 메뉴 삽입도 여기에 위치
