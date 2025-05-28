@@ -1,3 +1,4 @@
+// ✅ Firebase 인증 및 DB 모듈 가져오기
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
@@ -6,35 +7,10 @@ const db = getDatabase();
 
 const loadingScreen = document.getElementById("loadingScreen");
 
-// 🔽 초기엔 로딩 화면 보여줌
+// ✅ 초기 로딩 화면 표시
 if (loadingScreen) loadingScreen.style.display = "flex";
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    alert("ログインが必要です。");
-    window.location.href = "./index.html";
-    return;
-  }
-
-  try {
-    const userRef = ref(db, `users/${user.uid}`);
-    const snapshot = await get(userRef);
-
-    if (!snapshot.exists()) throw new Error("권한 정보 없음");
-
-    // ... 닉네임, role 확인 처리
-
-    // ✅ 로딩 완료 후 숨김
-    if (loadingScreen) loadingScreen.style.display = "none";
-
-  } catch (err) {
-    alert("認証エラー: " + err.message);
-    window.location.href = "./index.html";
-  }
-});
-
-
-
+// ✅ 사용자 인증 상태 확인
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("ログインが必要です。");
@@ -47,21 +23,22 @@ onAuthStateChanged(auth, async (user) => {
   const userEmailDisplay = document.getElementById("userEmail");
 
   try {
+    // ✅ 사용자 권한 정보 조회
     const userRef = ref(db, `users/${uid}`);
     const snapshot = await get(userRef);
 
-    if (!snapshot.exists()) throw new Error("권한 정보 없음");
+    if (!snapshot.exists()) throw new Error("권限情報が見つかりません");
 
     const data = snapshot.val();
     const role = data.role;
     const nickname = data.nickname;
 
-    // 닉네임 표시
+    // ✅ 화면에 사용자 닉네임 또는 이메일 표시
     if (userEmailDisplay) {
       userEmailDisplay.textContent = nickname ? `こんにちは、${nickname}様` : user.email;
     }
 
-    // ✅ 네비게이션 메뉴 삽입도 여기에 위치
+    // ✅ 네비게이션 메뉴 생성
     const navBox = document.querySelector(".nav-box");
     if (navBox) {
       const commonItems = [
@@ -88,25 +65,29 @@ onAuthStateChanged(auth, async (user) => {
       }
     }
 
-    // ✅ 접근 제어 (현재 페이지 기준)
+    // ✅ 페이지 접근 제한
     if (role === "admin") return;
 
     if (role === "manager") {
-      const isHomeOrOrdersPage = path.includes("/home") || path.includes("/orders");
-      if (isHomeOrOrdersPage) return;
+      const isAllowed = path.includes("/home") || path.includes("/orders");
+      if (isAllowed) return;
 
       alert("このページへのアクセス権限がありません。");
       window.location.href = "../home/";
       return;
     }
 
-    // 알 수 없는 권한
+    // ❌ 알 수 없는 권한
     alert("アクセス権限がありません。");
     window.location.href = "./index.html";
 
   } catch (err) {
-    console.error("권한 확인 실패:", err);
+    // ❌ 인증 에러 처리
+    console.error("認証エラー:", err);
     alert("認証エラー: " + err.message);
     window.location.href = "./index.html";
+  } finally {
+    // ✅ 성공/실패 관계없이 로딩 화면 닫기
+    if (loadingScreen) loadingScreen.style.display = "none";
   }
 });

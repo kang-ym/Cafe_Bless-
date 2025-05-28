@@ -1,0 +1,31 @@
+{
+    "orders": {
+      "-NvExample01": {
+        "timestamp": "2025-05-28T08:30:00.000Z",
+        "today": "2025_05_28",
+        "displayDate": "2025.05.28",
+        "coffee": "latte",
+        "coffeeJp": "ラテ",
+        "size": "M",
+        "temperature": "hot",
+        "quantity": 1,
+        "name": "홍길동",
+        "group": "信仰",
+        "price": 300
+      },
+      "-NvExample02": {
+        "timestamp": "2025-05-28T08:35:00.000Z",
+        "today": "2025_05_28",
+        "displayDate": "2025.05.28",
+        "coffee": "아메리카노",
+        "coffeeJp": "アメリカーノ",
+        "size": "L",
+        "temperature": "cold",
+        "quantity": 2,
+        "name": "김사랑",
+        "group": "希望",
+        "price": 600
+      }
+    }
+  }
+  
