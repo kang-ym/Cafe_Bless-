@@ -13,8 +13,11 @@ if (loadingScreen) loadingScreen.style.display = "flex";
 // ✅ 사용자 인증 상태 확인
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
+    // ✅ alert 후 redirect 충돌 방지 위해 지연 처리
     alert("ログインが必要です。");
-    window.location.href = "./index.html";
+    setTimeout(() => {
+      window.location.href = "../index.html";
+    }, 100); // 약간의 딜레이 후 리디렉션
     return;
   }
 
@@ -27,7 +30,7 @@ onAuthStateChanged(auth, async (user) => {
     const userRef = ref(db, `users/${uid}`);
     const snapshot = await get(userRef);
 
-    if (!snapshot.exists()) throw new Error("권限情報が見つかりません");
+    if (!snapshot.exists()) throw new Error("ユーザーの権限情報が見つかりません。管理者にお問い合わせください。");
 
     const data = snapshot.val();
     const role = data.role;
