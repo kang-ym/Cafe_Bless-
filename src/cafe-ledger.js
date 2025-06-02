@@ -1,9 +1,7 @@
 'use strict';
 
-// ✅ compat 방식 사용 (firebase-init.js에서 window.database 설정됨)
 const database = window.database;
 
-// ✅ 선택 삭제 관련 요소
 const ledgerTableBody = document.getElementById('ledger-table-body');
 const addPersonBtn = document.getElementById('ledger-btn-add-person');
 
@@ -20,20 +18,19 @@ selectBtn.after(deleteSelectedBtn);
 
 let selectionMode = false;
 
-// ✅ 날짜 키 및 날짜 포맷 함수
 function getTodayKey() {
   const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const date = String(today.getDate()).padStart(2, '0');
-  return `${year}_${month}_${date}`;
+  return `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}`;
 }
+
 function formatDisplayDate(dateKey) {
   return dateKey.replace(/_/g, '.');
 }
+
 function formatRecordEntries(entries = []) {
   return entries.map(e => `${e > 0 ? '+' : ''}${e}`).join('<br>');
 }
+
 function collectAllDates(groupData) {
   const dateSet = new Set();
   for (const personName in groupData) {
@@ -45,7 +42,6 @@ function collectAllDates(groupData) {
   return Array.from(dateSet).sort().reverse();
 }
 
-// ✅ 가계부 렌더 함수
 function renderLedger(groupName) {
   const groupRef = database.ref(`ledger/${groupName}`);
   groupRef.once('value').then(snapshot => {
@@ -75,31 +71,29 @@ function renderLedger(groupName) {
         rowHtml += `<td><input type="checkbox" class="ledger-select-box" data-name="${personName}" data-group="${groupName}"></td>`;
       }
 
-      if (groupName === 'guest') {
-        rowHtml += `<td class="cafe-ledger-col"><input type="text" class="edit-name" value="${personName}" data-old="${personName}"></td>`;
-      } else {
-        rowHtml += `<td class="cafe-ledger-col">${personName}</td>`;
-      }
+      rowHtml += groupName === 'guest'
+        ? `<td><input type="text" class="edit-name" value="${personName}" data-old="${personName}"></td>`
+        : `<td>${personName}</td>`;
 
       rowHtml += `
-        <td class="ledger-balance ${balanceClass}" data-balance="${person.balance}">${person.balance}</td>
-        <td><button class="ledger-btn-charge cafe-ledger-btn" data-name="${personName}">+</button></td>
+        <td class="ledger-balance ${balanceClass}">${person.balance}</td>
+        <td><button class="ledger-btn-charge" data-name="${personName}">+</button></td>
       `;
 
       allDates.forEach(date => {
         const entries = person.records?.[date] || [];
-        rowHtml += `<td class="cafe-ledger-cell">${formatRecordEntries(entries) || '-'}</td>`;
+        rowHtml += `<td>${formatRecordEntries(entries) || '-'}</td>`;
       });
 
       if (groupName === 'guest') {
         rowHtml += `
-          <td class="cafe-ledger-col">
+          <td>
             <select class="move-group">
               <option value="信仰">信仰</option>
               <option value="希望">希望</option>
               <option value="愛">愛</option>
             </select>
-            <button class="move-btn cafe-ledger-btn" data-name="${personName}">移動</button>
+            <button class="move-btn" data-name="${personName}">移動</button>
           </td>
         `;
       }
@@ -107,35 +101,23 @@ function renderLedger(groupName) {
       row.innerHTML = rowHtml;
       ledgerTableBody.appendChild(row);
 
-      const chargeBtn = row.querySelector('.ledger-btn-charge');
-      chargeBtn.addEventListener('click', () => {
+      // 충전 버튼
+      row.querySelector('.ledger-btn-charge').addEventListener('click', () => {
         const amount = parseInt(prompt(`${personName}님에게 충전할 금액을 입력하세요`, '1000'));
         if (!isNaN(amount)) {
           const todayKey = getTodayKey();
           const personRef = database.ref(`ledger/${groupName}/${personName}`);
-
           personRef.once('value').then(snapshot => {
             const personData = snapshot.val() || {};
-            const currentBalance = personData.balance || 0;
-            const newBalance = currentBalance + amount;
-
-            const updatedRecords = personData.records || {};
-            const todayList = Array.isArray(updatedRecords[todayKey]) ? updatedRecords[todayKey] : [];
-            todayList.push(amount);
-            updatedRecords[todayKey] = todayList;
-
-            const updatedData = {
-              balance: newBalance,
-              records: updatedRecords
-            };
-
-            personRef.set(updatedData)
-              .then(() => renderLedger(groupName))
-              .catch(err => alert('❌ 저장 실패: ' + err));
+            const balance = (personData.balance || 0) + amount;
+            const records = personData.records || {};
+            records[todayKey] = [...(records[todayKey] || []), amount];
+            personRef.set({ balance, records });
           });
         }
       });
 
+      // 이름 변경
       const nameInput = row.querySelector('.edit-name');
       if (nameInput) {
         nameInput.addEventListener('change', () => {
@@ -149,11 +131,17 @@ function renderLedger(groupName) {
             if (!data) return;
             ref.child(newName).set(data);
             ref.child(oldName).remove();
+
+            // ledgerNames도 수정
+            const nameRef = database.ref(`ledgerNames/${groupName}`);
+            nameRef.child(newName).set(true);
+            nameRef.child(oldName).remove();
             renderLedger(groupName);
           });
         });
       }
 
+      // 이동
       const moveBtn = row.querySelector('.move-btn');
       if (moveBtn) {
         moveBtn.addEventListener('click', () => {
@@ -164,6 +152,8 @@ function renderLedger(groupName) {
             if (!data) return;
             ref.child(newGroup).child(personName).set(data);
             ref.child('guest').child(personName).remove();
+            database.ref(`ledgerNames/${newGroup}/${personName}`).set(true);
+            database.ref(`ledgerNames/guest/${personName}`).remove();
             renderLedger('guest');
             renderLedger(newGroup);
           });
@@ -173,6 +163,7 @@ function renderLedger(groupName) {
   });
 }
 
+// ✅ 이름 열 스타일링 (선택 모드에 따라)
 function applyLedgerNameClass() {
   const rows = document.querySelectorAll('.ledger-table tbody tr');
   rows.forEach(row => {
@@ -194,7 +185,7 @@ function applyLedgerNameClass() {
   }
 }
 
-// ✅ 탭 클릭 시 그룹 변경
+// ✅ 탭 클릭 시 그룹 렌더링
 document.querySelectorAll('.cafe-ledger-tab a').forEach(tab => {
   tab.addEventListener('click', e => {
     e.preventDefault();
@@ -205,7 +196,7 @@ document.querySelectorAll('.cafe-ledger-tab a').forEach(tab => {
   });
 });
 
-// ✅ 사람 추가
+// ✅ 사람 추가 시 ledgerNames도 등록
 addPersonBtn.addEventListener('click', () => {
   const activeTab = document.querySelector('.cafe-ledger-tab a.active');
   const group = activeTab?.dataset.group || 'trust';
@@ -222,16 +213,18 @@ addPersonBtn.addEventListener('click', () => {
   };
 
   const personRef = database.ref(`ledger/${group}/${name}`);
+  const nameRef = database.ref(`ledgerNames/${group}/${name}`);
+
   personRef.set(newPerson)
+    .then(() => nameRef.set(true))
     .then(() => renderLedger(group))
     .catch(err => alert('❌ 저장 실패: ' + err));
 });
 
-// ✅ 선택 삭제 기능
+// ✅ 선택 삭제
 selectBtn.addEventListener('click', () => {
   selectionMode = !selectionMode;
-  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
-  const group = activeTab?.dataset.group || 'trust';
+  const group = document.querySelector('.cafe-ledger-tab a.active')?.dataset.group || 'trust';
   deleteSelectedBtn.style.display = selectionMode ? 'inline-block' : 'none';
   renderLedger(group);
   applyLedgerNameClass();
@@ -239,25 +232,22 @@ selectBtn.addEventListener('click', () => {
 
 deleteSelectedBtn.addEventListener('click', () => {
   const checkboxes = document.querySelectorAll('.ledger-select-box:checked');
-  if (checkboxes.length === 0) return alert('削除する人を選択してください');
-  if (!confirm('選択したメンバーを全て削除しますか？')) return;
+  if (!checkboxes.length) return alert('削除する人を選択してください');
+  if (!confirm('選択したメンバー를 삭제할까요？')) return;
 
   checkboxes.forEach(cb => {
     const name = cb.dataset.name;
     const group = cb.dataset.group;
-    database.ref(`ledger/${group}/${name}`).remove()
-      .then(() => renderLedger(group))
-      .catch(err => console.error("❌ 삭제 실패:", err));
+    database.ref(`ledger/${group}/${name}`).remove();
+    database.ref(`ledgerNames/${group}/${name}`).remove();
   });
+
+  const group = document.querySelector('.cafe-ledger-tab a.active')?.dataset.group || 'trust';
+  renderLedger(group);
 });
 
-// ✅ 페이지 처음 로딩 시 기본 그룹(信仰) 자동 표시
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', () => {
-    renderLedger("信仰");
-    applyLedgerNameClass();
-  });
-} else {
+// ✅ 초기 로딩
+document.addEventListener('DOMContentLoaded', () => {
   renderLedger("信仰");
   applyLedgerNameClass();
-}
+});

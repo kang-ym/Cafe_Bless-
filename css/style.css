@@ -200,6 +200,13 @@ main{
     line-height: 1.5;
 }
 
+.order-line {
+  padding: 4px 0;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+
 .order-table {
   width: 100%;
   border-collapse: collapse;
@@ -730,8 +737,13 @@ nav{
     align-items: center;
     padding: 6px 0;
   }
-  
-  
+  .coffee-container{
+    text-align: center; 
+
+  }
+  .order-box{
+    margin-top: 10px;
+  }
   /* -------------------------------------------------- */
   /* ✅ CAFE LEDGER 관련 스타일 */
   /* -------------------------------------------------- */
