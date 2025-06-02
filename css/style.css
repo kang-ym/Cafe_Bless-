@@ -348,6 +348,10 @@ h3{
     justify-content: center;
     align-items: center;
     margin-top: 5px;
+
+}
+#nameBox input{
+  width: 100px;
 }
 #group{
     text-align: center;
