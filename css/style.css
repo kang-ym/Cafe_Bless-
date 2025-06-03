@@ -205,6 +205,13 @@ main{
   font-size: 0.9rem;
   text-align: center;
 }
+.order-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  text-align: center;
+  color: var(--color-bg);
+}
 
 
 .order-table {

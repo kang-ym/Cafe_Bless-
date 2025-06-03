@@ -24,121 +24,134 @@ document.getElementById('getdate').textContent = displayDate;
 
 // ✅ 커피 강조
 function updateCoffeeSelection() {
-  coffeeRadios.forEach((radio, index) => {
-    imgBoxes[index].style.boxShadow = radio.checked
-      ? '0 0 15px var(--color-accent)'
-      : '3px 3px 10px var(--color-text)';
-  });
+    coffeeRadios.forEach((radio, index) => {
+        imgBoxes[index].style.boxShadow = radio.checked
+            ? '0 0 15px var(--color-accent)'
+            : '3px 3px 10px var(--color-text)';
+    });
 }
 coffeeRadios.forEach(radio => radio.addEventListener('change', updateCoffeeSelection));
 updateCoffeeSelection();
 
 // ✅ 온도/사이즈 강조
 function updateHotColdSelection() {
-  document.querySelectorAll('.hot-radio label').forEach(label => label.classList.remove('active'));
-  const selected = document.querySelector('.hot-radio input:checked');
-  if (selected) selected.nextElementSibling.classList.add('active');
+    document.querySelectorAll('.hot-radio label').forEach(label => label.classList.remove('active'));
+    const selected = document.querySelector('.hot-radio input:checked');
+    if (selected) selected.nextElementSibling.classList.add('active');
 }
 hotRadios.forEach(radio => radio.addEventListener('change', updateHotColdSelection));
 updateHotColdSelection();
 
 function updateSizeSelection() {
-  document.querySelectorAll('.size-radio label').forEach(label => label.classList.remove('active'));
-  const selected = document.querySelector('.size-radio input:checked');
-  if (selected) selected.nextElementSibling.classList.add('active');
+    document.querySelectorAll('.size-radio label').forEach(label => label.classList.remove('active'));
+    const selected = document.querySelector('.size-radio input:checked');
+    if (selected) selected.nextElementSibling.classList.add('active');
 }
 sizeRadios.forEach(radio => radio.addEventListener('change', updateSizeSelection));
 updateSizeSelection();
 
 // ✅ 이름 입력 or 선택
 function getCustomerName() {
-  const group = groupSelect.value;
-  if (!group) return null;
-  if (group === 'guest') {
-    const input = document.querySelector('#nameBox input');
-    return input?.value?.trim() || null;
-  } else {
-    const select = document.querySelector('#nameBox select');
-    return select?.value || null;
-  }
+    const group = groupSelect.value;
+    if (!group) return null;
+    if (group === 'guest') {
+        const input = document.querySelector('#nameBox input');
+        return input?.value?.trim() || null;
+    } else {
+        const select = document.querySelector('#nameBox select');
+        return select?.value || null;
+    }
 }
 
 // ✅ 그룹 변경 시 이름 목록 업데이트
 groupSelect.addEventListener('change', () => {
-  const group = groupSelect.value;
-  nameBox.innerHTML = '';
-  if (!group) return;
+    const group = groupSelect.value;
+    nameBox.innerHTML = '';
+    if (!group) return;
 
-  if (group === 'guest') {
-    nameBox.innerHTML = `<input type="text" placeholder="名前を入力">`;
-  } else {
-    database.ref(`ledgerNames/${group}`).once('value').then(snapshot => {
-      const data = snapshot.val();
-      if (!data) return;
-      const select = document.createElement('select');
-      select.innerHTML = `<option value="">名前を選択</option>`;
-      Object.keys(data).forEach(name => {
-        select.innerHTML += `<option value="${name}">${name}</option>`;
-      });
-      nameBox.innerHTML = '';
-      nameBox.appendChild(select);
-    });
-  }
+    if (group === 'guest') {
+        nameBox.innerHTML = `<input type="text" placeholder="名前を入力">`;
+    } else {
+        database.ref(`ledgerNames/${group}`).once('value').then(snapshot => {
+            const data = snapshot.val();
+            if (!data) return;
+            const select = document.createElement('select');
+            select.innerHTML = `<option value="">名前を選択</option>`;
+            Object.keys(data).forEach(name => {
+                select.innerHTML += `<option value="${name}">${name}</option>`;
+            });
+            nameBox.innerHTML = '';
+            nameBox.appendChild(select);
+        });
+    }
 });
 
 // ✅ 주문 버튼 처리
 orderBtn.addEventListener('click', () => {
-  const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
-  if (!selectedCoffee) {
-    orderResult.textContent = 'メニューを選択してください。';
-    return;
-  }
+    const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
+    if (!selectedCoffee) {
+        orderResult.innerHTML = '<div class="order-line">メニューを選択してください。</div>';
+        return;
+    }
 
-  const coffeeBox = selectedCoffee.closest('.coffe-box');
-  const coffeeLabel = coffeeBox.querySelector('h3')?.dataset.en;
-  const coffeeLabelJp = coffeeBox.querySelector('h3')?.textContent.trim();
-  const temperature = document.querySelector('.hot-radio input:checked')?.value;
-  const size = document.querySelector('.size-radio input:checked')?.value?.toUpperCase();
-  const quantity = parseInt(quantityInput.value, 10);
-  const name = getCustomerName();
-  const group = groupSelect.value;
+    const coffeeBox = selectedCoffee.closest('.coffe-box');
+    const coffeeLabel = coffeeBox.querySelector('h3')?.dataset.en;
+    const coffeeLabelJp = coffeeBox.querySelector('h3')?.textContent.trim();
+    const temperature = document.querySelector('.hot-radio input:checked')?.value;
+    const size = document.querySelector('.size-radio input:checked')?.value?.toUpperCase();
+    const quantity = parseInt(quantityInput.value, 10);
+    const name = getCustomerName();
+    const group = groupSelect.value;
 
-  if (!name || !group) {
-    orderResult.textContent = '注文者情報を入力してください。';
-    return;
-  }
+    if (!name || !group) {
+        orderResult.innerHTML = '<div class="order-line">注文者情報を入力してください。</div>';
+        return;
+    }
 
-  const priceElement = coffeeBox.querySelector('.Price');
-  const pricePerCup = parseInt(priceElement.dataset[`price${size.toLowerCase()}`], 10);
-  const totalPrice = pricePerCup * quantity;
+    const priceElement = coffeeBox.querySelector('.Price');
+    const pricePerCup = parseInt(priceElement.dataset[`price${size.toLowerCase()}`], 10);
+    const totalPrice = pricePerCup * quantity;
 
-  const orderData = {
-    today: firebaseDate,
-    coffee: coffeeLabel,
-    coffeeJp: coffeeLabelJp,
-    size,
-    temperature,
-    quantity,
-    price: totalPrice,
-    name,
-    group,
-    timestamp: Date.now()
-  };
+    const orderData = {
+        today: firebaseDate,
+        coffee: coffeeLabel,
+        coffeeJp: coffeeLabelJp,
+        size,
+        temperature,
+        quantity,
+        price: totalPrice,
+        name,
+        group,
+        timestamp: Date.now()
+    };
 
-  // ✅ Firebase orders 저장
-  database.ref(`orders/${firebaseDate}`).push(orderData)
-    .then(() => {
-      // 🔧 주문 버튼 텍스트 변경
-      orderBtn.textContent = '注文追加';
+    // ✅ Firebase 저장
+    database.ref(`orders/${firebaseDate}`).push(orderData)
+        .then(() => {
+            // ✅ 버튼 텍스트 변경
+            orderBtn.textContent = '注文追加';
 
-      // 🔧 주문 내용 누적 추가 표시
-      const orderLine = document.createElement('div');
-      orderLine.className = 'order-line';
-      orderLine.textContent = `✅ ${name}様（${coffeeLabelJp} ${size}, ${temperature}, ${quantity}杯）`;
-      orderResult.appendChild(orderLine);
-    })
-    .catch(err => {
-      console.error("注文送信エラー:", err);
-      orderResult.textContent = '注文送信に失敗しました。もう一度お試しください。';
-    });
+            // ✅ 처음 주문일 경우 기존 안내 메시지 제거 + 타이틀 추가
+            if (orderResult.textContent.includes('ご注文ください') ||
+            orderResult.textContent.includes('選択してください') ||
+            orderResult.textContent.includes('入力してください')) {
+                
+            orderResult.innerHTML = ''; // 초기화
+                
+              const title = document.createElement('div');
+              title.className = 'order-title';
+              title.textContent = '🧾 注文リスト';
+              orderResult.appendChild(title);
+            }
+
+            // ✅ 주문 내용 누적 표시
+            const orderLine = document.createElement('div');
+            orderLine.className = 'order-line';
+            orderLine.textContent = `✅ ${name}様（${coffeeLabelJp} ${size}, ${temperature}, ${quantity}杯）`;
+            orderResult.appendChild(orderLine);
+        })
+        .catch(err => {
+            console.error("注文送信エラー:", err);
+            orderResult.innerHTML = '<div class="order-line">注文送信に失敗しました。もう一度お試しください。</div>';
+        });
 });
