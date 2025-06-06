@@ -29,7 +29,27 @@ function updateCoffeeSelection() {
             ? '0 0 15px var(--color-accent)'
             : '3px 3px 10px var(--color-text)';
     });
+    updateHotRadioAvailability(); // 🔥 hot/cold 제어
 }
+//여름 계절 주문처리 라떼들 핫주문 안됨
+function updateHotRadioAvailability() {
+    const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked').value;
+    const hotInput = document.querySelector('.hot-radio input[value="hot"]');
+    const hotLabel = hotInput.nextElementSibling;
+    const coldInput = document.querySelector('.hot-radio input[value="cold"]');
+    const coldLabel = coldInput.nextElementSibling;
+
+    if (selectedCoffee !== 'americano') {
+        hotInput.style.display = 'none';
+        hotLabel.style.display = 'none';
+        coldInput.checked = true;
+        updateHotColdSelection(); // 스타일 업데이트
+    } else {
+        hotInput.style.display = '';
+        hotLabel.style.display = '';
+    }
+}
+
 coffeeRadios.forEach(radio => radio.addEventListener('change', updateCoffeeSelection));
 updateCoffeeSelection();
 
