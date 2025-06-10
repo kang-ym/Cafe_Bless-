@@ -1,12 +1,12 @@
-// cafe-ledger.js 전체 수정본 - 이름 열 위치 안정화 포함 (selectionMode 대응)
-
 'use strict';
 
 const database = window.database;
 
+// ✅ 주요 요소 가져오기
 const ledgerTableBody = document.getElementById('ledger-table-body');
 const addPersonBtn = document.getElementById('ledger-btn-add-person');
 
+// ✅ 선택 버튼 및 삭제 버튼 생성
 const selectBtn = document.createElement('button');
 selectBtn.textContent = '選択';
 selectBtn.id = 'ledger-btn-select';
@@ -18,22 +18,26 @@ deleteSelectedBtn.id = 'ledger-btn-delete';
 deleteSelectedBtn.style.display = 'none';
 selectBtn.after(deleteSelectedBtn);
 
-let selectionMode = false;
+let selectionMode = false; // ✅ 선택 모드 여부 저장
 
+// ✅ 날짜 키 함수
 function getTodayKey() {
   const today = new Date();
   return `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}`;
 }
 
+// ✅ 날짜 표시 형식 함수
 function formatDisplayDate(dateKey) {
   return dateKey.replace(/_/g, '.');
 }
 
+// ✅ 하나의 셀에 여러 금액 표시
 function formatRecordEntries(entries = []) {
   if (!Array.isArray(entries)) entries = [entries];
   return entries.map(e => `${e > 0 ? '+' : ''}${e}`).join('<br>');
 }
 
+// ✅ 해당 그룹 전체의 날짜 키 모으기
 function collectAllDates(groupData) {
   const dateSet = new Set();
   for (const personName in groupData) {
@@ -45,6 +49,7 @@ function collectAllDates(groupData) {
   return Array.from(dateSet).sort().reverse();
 }
 
+// ✅ 메인 렌더링 함수
 async function renderLedger(groupName) {
   const [groupSnap, aliasSnap] = await Promise.all([
     database.ref(`ledger/${groupName}`).once('value'),
@@ -54,6 +59,7 @@ async function renderLedger(groupName) {
   const groupData = groupSnap.val() || {};
   const aliasData = aliasSnap.val() || {};
 
+  // ✅ 그룹명에 대응되는 하위 멤버 구성 추출
   const groupToMembers = {};
   Object.entries(aliasData).forEach(([member, group]) => {
     if (!groupToMembers[group]) groupToMembers[group] = [];
@@ -62,14 +68,15 @@ async function renderLedger(groupName) {
 
   const allDates = collectAllDates(groupData);
 
+  // ✅ 헤더 작성
   const ledgerTableHead = document.getElementById('ledger-table-head-row');
   ledgerTableHead.innerHTML = `
     ${selectionMode ? '<th></th>' : ''}
-    <th class="cafe-ledger-col">名前</th>
-    <th class="cafe-ledger-col">残高</th>
-    <th class="cafe-ledger-col">チャージ</th>
-    ${allDates.map(date => `<th class="cafe-ledger-date">${formatDisplayDate(date)}</th>`).join('')}
-    ${groupName === 'guest' ? '<th class="cafe-ledger-col">移動</th>' : ''}
+    <th>名前</th>
+    <th>残高</th>
+    <th>チャージ</th>
+    ${allDates.map(date => `<th>${formatDisplayDate(date)}</th>`).join('')}
+    ${groupName === 'guest' ? '<th>移動</th>' : ''}
   `;
 
   ledgerTableBody.innerHTML = '';
@@ -103,6 +110,7 @@ async function renderLedger(groupName) {
       rowHtml += `<td>${formatRecordEntries(entries) || '-'}</td>`;
     });
 
+    // ✅ 게스트 이동 기능
     if (groupName === 'guest') {
       rowHtml += `
         <td>
@@ -119,11 +127,13 @@ async function renderLedger(groupName) {
     row.innerHTML = rowHtml;
     ledgerTableBody.appendChild(row);
 
+    // ✅ 그룹 멤버 보기 토글
     row.querySelector('.show-members-btn')?.addEventListener('click', () => {
       const box = document.getElementById(`members-${personName}`);
       box.classList.toggle('hidden');
     });
 
+    // ✅ 충전 버튼
     row.querySelector('.ledger-btn-charge')?.addEventListener('click', () => {
       const amount = parseInt(prompt(`${personName}様にチャージする金額を入力してください`, '1000'));
       if (!isNaN(amount)) {
@@ -140,31 +150,66 @@ async function renderLedger(groupName) {
         });
       }
     });
+
+    // ✅ 이동 버튼 처리
+    row.querySelector('.move-btn')?.addEventListener('click', async () => {
+      const newGroup = row.querySelector('.move-group')?.value;
+      const personRef = database.ref(`ledger/guest/${personName}`);
+      const personData = (await personRef.once('value')).val();
+      const todayKey = getTodayKey();
+
+      const updates = {
+        [`ledger/guest/${personName}`]: null,
+        [`ledgerNames/guest/${personName}`]: null,
+        [`ledger/${newGroup}/${personName}`]: personData,
+        [`ledgerNames/${newGroup}/${personName}`]: true
+      };
+
+      await database.ref().update(updates);
+      renderLedger('guest');
+    });
   }
 }
 
-function applyLedgerNameClass() {
-  const rows = document.querySelectorAll('.ledger-table tbody tr');
-  rows.forEach(row => {
-    const tds = row.querySelectorAll('td');
-    tds.forEach(td => td.classList.remove('ledger-name'));
-    if (selectionMode) {
-      tds[1]?.classList.add('ledger-name');
-    } else {
-      tds[0]?.classList.add('ledger-name');
-    }
+// ✅ 선택 버튼 → 체크박스 토글
+selectBtn.addEventListener('click', () => {
+  selectionMode = !selectionMode;
+  const group = document.querySelector('.cafe-ledger-tab a.active')?.dataset.group || '信仰';
+  deleteSelectedBtn.style.display = selectionMode ? 'inline-block' : 'none';
+  renderLedger(group);
+  applyLedgerNameClass();
+});
+
+// ✅ 삭제 시 nameAlias 안도 같이 정리
+deleteSelectedBtn.addEventListener('click', async () => {
+  const checkboxes = document.querySelectorAll('.ledger-select-box:checked');
+  if (!checkboxes.length) return alert('削除する人を選択してください');
+  if (!confirm('本当に削除しますか？')) return;
+
+  const aliasSnap = await database.ref('nameAlias').once('value');
+  const aliasData = aliasSnap.val() || {};
+  const updates = {};
+
+  checkboxes.forEach(cb => {
+    const name = cb.dataset.name;
+    const group = cb.dataset.group;
+    updates[`ledger/${group}/${name}`] = null;
+    updates[`ledgerNames/${group}/${name}`] = null;
+
+    // ✅ nameAlias에서 value가 삭제 대상인 경우 같이 제거
+    Object.entries(aliasData).forEach(([aliasName, aliasGroup]) => {
+      if (aliasGroup === name) {
+        updates[`nameAlias/${aliasName}`] = null;
+      }
+    });
   });
 
-  const ths = document.querySelectorAll('#ledger-table-head-row th');
-  ths.forEach(th => th.classList.remove('ledger-name'));
-  if (selectionMode) {
-    ths[1]?.classList.add('ledger-name');
-  } else {
-    ths[0]?.classList.add('ledger-name');
-  }
-}
+  await database.ref().update(updates);
+  const group = document.querySelector('.cafe-ledger-tab a.active')?.dataset.group || '信仰';
+  renderLedger(group);
+});
 
-// 그룹 탭 전환
+// ✅ 탭 클릭 → 그룹 전환
 document.querySelectorAll('.cafe-ledger-tab a').forEach(tab => {
   tab.addEventListener('click', e => {
     e.preventDefault();
@@ -175,10 +220,11 @@ document.querySelectorAll('.cafe-ledger-tab a').forEach(tab => {
   });
 });
 
+// ✅ 사람 추가 기능 (개인 / 그룹)
 addPersonBtn.addEventListener('click', async () => {
-  const activeTab = document.querySelector('.cafe-ledger-tab a.active');
-  const group = activeTab?.dataset.group || '信仰';
+  const group = document.querySelector('.cafe-ledger-tab a.active')?.dataset.group || '信仰';
   const mode = prompt("1：個人追加\n2：グループ追加\nどちらを行いますか？");
+  if (!mode) return;
 
   if (mode === '1') {
     const name = prompt('名前を入力してください');
@@ -191,50 +237,40 @@ addPersonBtn.addEventListener('click', async () => {
     renderLedger(group);
   } else if (mode === '2') {
     const groupName = prompt('グループ名を入力してください');
-    const members = prompt('グループに含める名前をカンマで区切って入力 (例：ミナ,ヨンミン)');
+    const members = prompt('グループに含める名前をカンマで区切って入力 (例：민아,영민)');
     if (!groupName || !members) return;
     const balance = parseInt(prompt('初期残高は？', '0')) || 0;
     const todayKey = getTodayKey();
     const newPerson = { balance, records: { [todayKey]: [balance] } };
-
     const updates = {
       [`ledger/${group}/${groupName}`]: newPerson,
       [`ledgerNames/${group}/${groupName}`]: true
     };
-
-    members.split(',').map(m => m.trim()).forEach(name => {
+    members.split(',').map(n => n.trim()).forEach(name => {
       updates[`nameAlias/${name}`] = groupName;
     });
-
     await database.ref().update(updates);
     renderLedger(group);
   }
 });
 
-selectBtn.addEventListener('click', () => {
-  selectionMode = !selectionMode;
-  const group = document.querySelector('.cafe-ledger-tab a.active')?.dataset.group || '信仰';
-  deleteSelectedBtn.style.display = selectionMode ? 'inline-block' : 'none';
-  renderLedger(group);
-  applyLedgerNameClass();
-});
-
-deleteSelectedBtn.addEventListener('click', () => {
-  const checkboxes = document.querySelectorAll('.ledger-select-box:checked');
-  if (!checkboxes.length) return alert('削除する人を選択してください');
-  if (!confirm('本当に削除しますか？')) return;
-
-  checkboxes.forEach(cb => {
-    const name = cb.dataset.name;
-    const group = cb.dataset.group;
-    database.ref(`ledger/${group}/${name}`).remove();
-    database.ref(`ledgerNames/${group}/${name}`).remove();
+// ✅ 이름 칸 스타일 적용 보조 함수
+function applyLedgerNameClass() {
+  const rows = document.querySelectorAll('.ledger-table tbody tr');
+  rows.forEach(row => {
+    const tds = row.querySelectorAll('td');
+    tds.forEach(td => td.classList.remove('ledger-name'));
+    if (selectionMode) tds[1]?.classList.add('ledger-name');
+    else tds[0]?.classList.add('ledger-name');
   });
 
-  const group = document.querySelector('.cafe-ledger-tab a.active')?.dataset.group || '信仰';
-  renderLedger(group);
-});
+  const ths = document.querySelectorAll('#ledger-table-head-row th');
+  ths.forEach(th => th.classList.remove('ledger-name'));
+  if (selectionMode) ths[1]?.classList.add('ledger-name');
+  else ths[0]?.classList.add('ledger-name');
+}
 
+// ✅ 초기화 실행
 document.addEventListener('DOMContentLoaded', () => {
   renderLedger("信仰");
   applyLedgerNameClass();
