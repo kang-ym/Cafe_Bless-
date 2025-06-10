@@ -22,28 +22,29 @@ const firebaseDate = `${year}_${month}_${date}`;
 const displayDate = `${year}.${month}.${date}`;
 document.getElementById('getdate').textContent = displayDate;
 
-// ✅ 커피 강조
+// ✅ 커피 선택 시 강조 효과 적용 및 hot/cold 조건 처리
 function updateCoffeeSelection() {
     coffeeRadios.forEach((radio, index) => {
         imgBoxes[index].style.boxShadow = radio.checked
             ? '0 0 15px var(--color-accent)'
             : '3px 3px 10px var(--color-text)';
     });
-    updateHotRadioAvailability(); // 🔥 hot/cold 제어
+    updateHotRadioAvailability();
 }
-//여름 계절 주문처리 라떼들 핫주문 안됨
+
+// ✅ 여름 계절용 제한: 아메리카노 외에는 hot 선택 불가
 function updateHotRadioAvailability() {
-    const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked').value;
+    const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked')?.value;
     const hotInput = document.querySelector('.hot-radio input[value="hot"]');
     const hotLabel = hotInput.nextElementSibling;
     const coldInput = document.querySelector('.hot-radio input[value="cold"]');
     const coldLabel = coldInput.nextElementSibling;
 
-    if (selectedCoffee !== 'americano') {
+    if (selectedCoffee && selectedCoffee !== 'americano') {
         hotInput.style.display = 'none';
         hotLabel.style.display = 'none';
         coldInput.checked = true;
-        updateHotColdSelection(); // 스타일 업데이트
+        updateHotColdSelection();
     } else {
         hotInput.style.display = '';
         hotLabel.style.display = '';
@@ -53,7 +54,7 @@ function updateHotRadioAvailability() {
 coffeeRadios.forEach(radio => radio.addEventListener('change', updateCoffeeSelection));
 updateCoffeeSelection();
 
-// ✅ 온도/사이즈 강조
+// ✅ 온도 및 사이즈 버튼 활성화 스타일 처리
 function updateHotColdSelection() {
     document.querySelectorAll('.hot-radio label').forEach(label => label.classList.remove('active'));
     const selected = document.querySelector('.hot-radio input:checked');
@@ -70,7 +71,7 @@ function updateSizeSelection() {
 sizeRadios.forEach(radio => radio.addEventListener('change', updateSizeSelection));
 updateSizeSelection();
 
-// ✅ 이름 입력 or 선택
+// ✅ 현재 선택된 고객 이름 가져오기 (게스트는 input, 일반 그룹은 select)
 function getCustomerName() {
     const group = groupSelect.value;
     if (!group) return null;
@@ -83,7 +84,11 @@ function getCustomerName() {
     }
 }
 
-// ✅ 그룹 변경 시 이름 목록 업데이트
+// ✅ 그룹 선택 시 이름 목록 업데이트
+// 1. ledgerNames/{group} 에 있는 일반 이름은 그대로 표시
+// 2. nameAlias 안에서 해당 그룹 대표이름이 ledgerNames 안에 존재하면 해당 별칭 키도 포함
+// 3. 단, ledgerNames에 등록된 그룹 대표이름(예: 민아영민, 테스트가족)은 표시하지 않음
+
 groupSelect.addEventListener('change', () => {
     const group = groupSelect.value;
     nameBox.innerHTML = '';
@@ -91,22 +96,39 @@ groupSelect.addEventListener('change', () => {
 
     if (group === 'guest') {
         nameBox.innerHTML = `<input type="text" placeholder="名前を入力">`;
-    } else {
-        database.ref(`ledgerNames/${group}`).once('value').then(snapshot => {
-            const data = snapshot.val();
-            if (!data) return;
-            const select = document.createElement('select');
-            select.innerHTML = `<option value="">名前を選択</option>`;
-            Object.keys(data).forEach(name => {
-                select.innerHTML += `<option value="${name}">${name}</option>`;
-            });
-            nameBox.innerHTML = '';
-            nameBox.appendChild(select);
-        });
+        return;
     }
+
+    Promise.all([
+        database.ref(`ledgerNames/${group}`).once('value'),
+        database.ref(`nameAlias`).once('value')
+    ]).then(([ledgerSnap, aliasSnap]) => {
+        const ledgerData = ledgerSnap.val() || {};
+        const aliasData = aliasSnap.val() || {};
+
+        const aliasGroupNames = new Set(Object.values(aliasData));
+        const select = document.createElement('select');
+        select.innerHTML = `<option value="">名前を選択</option>`;
+
+        // 1. 일반 이름 표시 (그룹 대표이름 제외)
+        Object.keys(ledgerData).forEach(name => {
+            if (!aliasGroupNames.has(name)) {
+                select.innerHTML += `<option value="${name}">${name}</option>`;
+            }
+        });
+
+        // 2. nameAlias 안에 해당 그룹에 포함된 이름 표시
+        Object.entries(aliasData).forEach(([aliasName, aliasGroupName]) => {
+            if (ledgerData[aliasGroupName]) {
+                select.innerHTML += `<option value="${aliasName}">${aliasName}</option>`;
+            }
+        });
+
+        nameBox.appendChild(select);
+    });
 });
 
-// ✅ 주문 버튼 처리
+// ✅ 주문 버튼 클릭 처리 → Firebase에 orders 저장
 orderBtn.addEventListener('click', () => {
     const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked');
     if (!selectedCoffee) {
@@ -140,31 +162,25 @@ orderBtn.addEventListener('click', () => {
         temperature,
         quantity,
         price: totalPrice,
-        name,
+        name,  // 선택된 실제 이름 그대로 저장 (예: 트다, 김예희 등)
         group,
         timestamp: Date.now()
     };
 
-    // ✅ Firebase 저장
     database.ref(`orders/${firebaseDate}`).push(orderData)
         .then(() => {
-            // ✅ 버튼 텍스트 변경
             orderBtn.textContent = '注文追加';
 
-            // ✅ 처음 주문일 경우 기존 안내 메시지 제거 + 타이틀 추가
             if (orderResult.textContent.includes('ご注文ください') ||
-            orderResult.textContent.includes('選択してください') ||
-            orderResult.textContent.includes('入力してください')) {
-                
-            orderResult.innerHTML = ''; // 초기화
-                
-              const title = document.createElement('div');
-              title.className = 'order-title';
-              title.textContent = '🧾 注文リスト';
-              orderResult.appendChild(title);
+                orderResult.textContent.includes('選択してください') ||
+                orderResult.textContent.includes('入力してください')) {
+                orderResult.innerHTML = '';
+                const title = document.createElement('div');
+                title.className = 'order-title';
+                title.textContent = '🧾 注文リスト';
+                orderResult.appendChild(title);
             }
 
-            // ✅ 주문 내용 누적 표시
             const orderLine = document.createElement('div');
             orderLine.className = 'order-line';
             orderLine.textContent = `✅ ${name}様（${coffeeLabelJp} ${size}, ${temperature}, ${quantity}杯）`;
