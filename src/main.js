@@ -92,13 +92,22 @@ function getCustomerName() {
 groupSelect.addEventListener('change', () => {
     const group = groupSelect.value;
     nameBox.innerHTML = '';
-    if (!group) return;
+    const nameBoxWrapper = nameBox.parentElement; // .name-box
 
-    if (group === 'guest') {
-        nameBox.innerHTML = `<input type="text" placeholder="名前を入力">`;
+    // 그룹이 선택되지 않았을 때 → 가운데 정렬 유지
+    if (!group) {
+        nameBoxWrapper.classList.remove('has-name');
         return;
     }
 
+    // 게스트 그룹 → input
+    if (group === 'guest') {
+        nameBox.innerHTML = `<input type="text" placeholder="名前を入力">`;
+        nameBoxWrapper.classList.add('has-name'); // ✅ 클래스 추가
+        return;
+    }
+
+    // 일반 그룹 → select 생성
     Promise.all([
         database.ref(`ledgerNames/${group}`).once('value'),
         database.ref(`nameAlias`).once('value')
@@ -117,7 +126,7 @@ groupSelect.addEventListener('change', () => {
             }
         });
 
-        // 2. nameAlias 안에 해당 그룹에 포함된 이름 표시
+        // 2. alias 이름도 추가
         Object.entries(aliasData).forEach(([aliasName, aliasGroupName]) => {
             if (ledgerData[aliasGroupName]) {
                 select.innerHTML += `<option value="${aliasName}">${aliasName}</option>`;
@@ -125,8 +134,12 @@ groupSelect.addEventListener('change', () => {
         });
 
         nameBox.appendChild(select);
+
+        // ✅ 클래스 추가 (이름 선택창이 생겼으므로)
+        nameBoxWrapper.classList.add('has-name');
     });
 });
+
 
 // ✅ 주문 버튼 클릭 처리 → Firebase에 orders 저장
 orderBtn.addEventListener('click', () => {
