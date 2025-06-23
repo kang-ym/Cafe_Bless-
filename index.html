@@ -91,7 +91,10 @@
                         <input type="radio" name="coffee" value="americano" id="americano" checked>
                         <label for="americano">
                             <div class="img-box">
-                                <h3 data-en="Americano">アメリカーノ</h3>
+                                <h3 data-en="Americano">
+                                    <span class="custom-check"></span>
+                                    アメリカーノ
+                                </h3>
                                 <img src="./img/1.webp" alt="">
                             </div>
                         </label>
@@ -101,7 +104,10 @@
                         <input type="radio" name="coffee" value="latte" id="latte">
                         <label for="latte">
                             <div class="img-box">
-                                <h3 data-en="Latte">ラテ</h3>
+                                <h3 data-en="Latte">
+                                    <span class="custom-check"></span>
+                                    ラテ
+                                </h3>
                                 <img src="./img/2.webp" alt="">
                             </div>
                         </label>
@@ -111,7 +117,10 @@
                         <input type="radio" name="coffee" value="vanilla-latte" id="vanillaLatte">
                         <label for="vanillaLatte">
                             <div class="img-box">
-                                <h3 data-en="Vanilla Latte">バニララテ</h3>
+                                <h3 data-en="Vanilla Latte">
+                                    <span class="custom-check"></span>
+                                    バニララテ
+                                </h3>
                                 <img src="./img/3.webp" alt="">
                             </div>
                         </label>
@@ -121,7 +130,10 @@
                         <input type="radio" name="coffee" value="caramel-latte" id="caramelLatte">
                         <label for="caramelLatte">
                             <div class="img-box">
-                                <h3 data-en="Caramel Latte">キャラメルラテ</h3>
+                                <h3 data-en="Caramel Latte">
+                                    <span class="custom-check"></span>
+                                    キャラメルラテ
+                                </h3>
                                 <img src="./img/4.webp" alt="" style="object-position: center -150px;">
                             </div>
                         </label>
@@ -130,15 +142,20 @@
                 </div>
                 <div class="info-box">
                     <div class="hot-radio input-box">
-                        <input type="radio" name="temperature" value="hot" id="hotOption" checked>
-                        <label for="hotOption">
-                            <i class="fa-solid fa-fire"></i>
+                        <label for="hotOption" class="hot-block">
+                          <i class="fa-solid fa-fire"></i>
+                          <span class="hot-text temp-text">HOT</span>
                         </label>
+                        <input type="radio" name="temperature" value="hot" id="hotOption">
+                      
                         <input type="radio" name="temperature" value="cold" id="coldOption">
-                        <label for="coldOption">
-                            <i class="fa-regular fa-snowflake"></i>
+                        <label for="coldOption" class="cold-block">
+                          <i class="fa-regular fa-snowflake"></i>
+                          <span class="cold-text temp-text">COLD</span>
                         </label>
-                    </div>
+                      </div>
+                      
+                    
                     <div class="size-radio input-box">
                         <input type="radio" name="size" value="R" id="regularOption" checked>
                         <label for="regularOption">R</label>

@@ -36,33 +36,51 @@ function updateCoffeeSelection() {
 function updateHotRadioAvailability() {
     const selectedCoffee = document.querySelector('.coffe-box input[type="radio"]:checked')?.value;
     const hotInput = document.querySelector('.hot-radio input[value="hot"]');
-    const hotLabel = hotInput.nextElementSibling;
     const coldInput = document.querySelector('.hot-radio input[value="cold"]');
-    const coldLabel = coldInput.nextElementSibling;
+    const hotBlock = document.querySelector('.hot-block');
+    const coldBlock = document.querySelector('.cold-block');
 
     if (selectedCoffee && selectedCoffee !== 'americano') {
+        // 🔥 HOT 비활성화
         hotInput.style.display = 'none';
-        hotLabel.style.display = 'none';
-        coldInput.checked = true;
+        hotBlock.style.display = 'none';  // ✅ 🔥 블록 자체 숨김
+        coldInput.checked = true;         // ❄️ 자동 선택
         updateHotColdSelection();
     } else {
+        // 🔥 HOT 다시 표시
         hotInput.style.display = '';
-        hotLabel.style.display = '';
+        hotBlock.style.display = '';
     }
 }
+
 
 coffeeRadios.forEach(radio => radio.addEventListener('change', updateCoffeeSelection));
 updateCoffeeSelection();
 
-// ✅ 온도 및 사이즈 버튼 활성화 스타일 처리
+// ✅ 온도 및 사이즈 버튼 활성화 스타일 처리 (🔥 슬라이드 + 간격제어 포함)
 function updateHotColdSelection() {
-    document.querySelectorAll('.hot-radio label').forEach(label => label.classList.remove('active'));
+    const hotBlock = document.querySelector('.hot-block');
+    const coldBlock = document.querySelector('.cold-block');
+
+    // 모두 초기화
+    hotBlock.classList.remove('active');
+    coldBlock.classList.remove('active');
+
     const selected = document.querySelector('.hot-radio input:checked');
-    if (selected) selected.nextElementSibling.classList.add('active');
+    if (selected) {
+        if (selected.value === 'hot') {
+            hotBlock.classList.add('active');
+        } else {
+            coldBlock.classList.add('active');
+        }
+    }
 }
 hotRadios.forEach(radio => radio.addEventListener('change', updateHotColdSelection));
 updateHotColdSelection();
 
+
+
+// ✅ 사이즈 버튼 스타일 처리
 function updateSizeSelection() {
     document.querySelectorAll('.size-radio label').forEach(label => label.classList.remove('active'));
     const selected = document.querySelector('.size-radio input:checked');

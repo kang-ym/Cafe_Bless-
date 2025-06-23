@@ -309,31 +309,63 @@ main{
 .hot-radio {
   display: flex;
   justify-content: center;
-  gap: 40px;
-  padding: 20px 0 10px;
-  width: 100%;
+  align-items: center;
+  gap: 12px;
 }
-.hot-radio label i {
+
+.hot-block,
+.cold-block {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* 아이콘 기본 스타일 */
+.hot-block i,
+.cold-block i {
   font-size: 1.8rem;
   color: var(--color-primary);
-  transition: .3s;
+  opacity: .8;
+  transition: transform 0.3s, color 0.3s;
 }
-.fa-fire:hover {
-  transform: scale(1.1);
+
+/* 텍스트 기본 숨김 */
+.temp-text {
+  margin-left: 6px;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s, transform 0.3s;
+  font-weight: bold;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* HOT 선택 시 */
+.hot-block.active i {
   color: #ff6565;
-}
-.fa-snowflake:hover {
   transform: scale(1.1);
-  color: #65d1ff;
+  opacity: 1;
 }
-.hot-radio label.active > i.fa-fire {
-  transform: scale(1.1);
+.hot-block.active .temp-text {
+  opacity: 1;
+  transform: translateX(0);
   color: #ff6565;
+  opacity: 1;
 }
-.hot-radio label.active > i.fa-snowflake {
-  transform: scale(1.1);
+
+/* COLD 선택 시 */
+.cold-block.active i {
   color: #65d1ff;
+  transform: scale(1.1);
+  opacity: 1;
 }
+.cold-block.active .temp-text {
+  opacity: 1;
+  transform: translateX(0);
+  color: #65d1ff;
+  opacity: 1;
+}
+
 
 /* 📏 사이즈 선택 (R/L) */
 .size-radio {
@@ -344,9 +376,13 @@ main{
   width: 100%;
 }
 .size-radio label {
+  width: 30px;
+  aspect-ratio: 1/1;
+  border-radius: 8px;
   font-size: 1.8rem;
   font-weight: bold;
   color: var(--color-primary);
+  opacity: .8;
   transition: .3s;
 }
 .size-radio label:hover {
@@ -354,9 +390,11 @@ main{
   color: var(--color-accent);
 }
 .size-radio label.active {
+  background-color: var(--color-accent);
   transform: scale(1.2);
-  color: var(--color-accent);
+  color: var(--color-bg);
   text-shadow: 0 0 5px var(--color-accent-light);
+  opacity: 1;
 }
 
 /* 🙋 주문자 입력 영역 */
@@ -588,7 +626,7 @@ main{
   }
 }
 
-
+/* signup  media*/
 @media (width < 768px) {
   .login-body {
     padding: 20px 10px;
@@ -1313,29 +1351,77 @@ footer{
       display: block;
     }
 
-    .select-box{
+    /* .select-box{
         position: relative;
         display: flex;
         flex-wrap: nowrap;
         overflow: auto;
         scroll-snap-type: x mandatory;
         scroll-padding: 20px;
-    }
-    .coffe-box{
+    } */
+    /* .coffe-box{
         flex: 0 0 80%;
         scroll-snap-align: start;
         scroll-snap-stop: always;
         padding-bottom: 10px;
+    } */
+
+    .img-box{
+      aspect-ratio: unset;
+      
+      >h3{
+        padding: 10px;
+        background-color: transparent;
+        opacity: 1;
+        font-size: 1rem;
+        font-weight: bold;
+        text-shadow:  0 0 0;
+        border-radius: 0 0 0 0;
+      }
+      >img{
+        display: none;
+      }
     }
 
+    /* ✅ 체크 표시 커스텀용 */
+    .custom-check {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      vertical-align: middle;
+      border: 2px solid var(--color-accent);
+      border-radius: 4px;
+      background-color: transparent;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    input[type="radio"]:checked + label .custom-check::after {
+      content: '✓';
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      line-height: 16px;
+      background-color: var(--color-accent);
+    }
+
+
+
     .ledger-table th,
-.ledger-table td {
-    min-width: 80px;
-    max-width: 120px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+    .ledger-table td {
+        min-width: 80px;
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
 
 .home-container {
