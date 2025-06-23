@@ -477,6 +477,40 @@ main{
     }
 }
 
+/* 주문 완료 팝업 */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4); /* 어두운 배경 */
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9998;
+}
+
+.popup-overlay.show {
+  display: flex;
+}
+
+.popup-message {
+  background-color: #4caf50;
+  color: white;
+  padding: 16px 32px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+
+.popup-message.show {
+  opacity: 1;
+}
+
+
+
 /* login.css - 개선된 로그인 전용 스타일 */
 
 .login-body {

@@ -22,6 +22,22 @@ const firebaseDate = `${year}_${month}_${date}`;
 const displayDate = `${year}.${month}.${date}`;
 document.getElementById('getdate').textContent = displayDate;
 
+//✅ 주문완료 팝업
+function showPopup(message) {
+    const overlay = document.getElementById('popupOverlay');
+    const popup = document.getElementById('popupMessage');
+
+    popup.textContent = message;
+    overlay.classList.add('show');
+    popup.classList.add('show');
+
+    setTimeout(() => {
+        popup.classList.remove('show');
+        overlay.classList.remove('show');
+    }, 3000);
+}
+
+
 // ✅ 커피 선택 시 강조 효과 적용 및 hot/cold 조건 처리
 function updateCoffeeSelection() {
     coffeeRadios.forEach((radio, index) => {
@@ -202,6 +218,9 @@ orderBtn.addEventListener('click', () => {
         .then(() => {
             orderBtn.textContent = '注文追加';
 
+        // ✅ 팝업 표시 
+        showPopup('注文が正常に処理されました。');
+
             if (orderResult.textContent.includes('ご注文ください') ||
                 orderResult.textContent.includes('選択してください') ||
                 orderResult.textContent.includes('入力してください')) {
@@ -222,3 +241,5 @@ orderBtn.addEventListener('click', () => {
             orderResult.innerHTML = '<div class="order-line">注文送信に失敗しました。もう一度お試しください。</div>';
         });
 });
+
+
