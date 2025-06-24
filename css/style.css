@@ -35,8 +35,8 @@ input[type = 'radio']{
 }
 select, input {
       /* 💡 iOS 기본 스타일 제거 */
-      -webkit-appearance: auto;
-      appearance: auto;
+      -webkit-appearance: none;
+      appearance: none;
 }
 input{
   outline: transparent;
