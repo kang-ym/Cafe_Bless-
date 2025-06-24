@@ -435,8 +435,6 @@ main{
   width: 90%; 
   min-width: 100px;
   font-size: 1.1rem;
-  appearance: auto;
-  -webkit-appearance: auto;
 }
 
 #nameBox {
