@@ -429,8 +429,6 @@ main{
 }
 
 #group {
-  display: block;
-  box-sizing: border-box;
   text-align: center;
   width: 90%; 
   min-width: 100px;
