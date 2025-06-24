@@ -226,7 +226,9 @@ addPersonBtn.addEventListener('click', async () => {
   const mode = prompt("1：個人追加\n2：グループ追加\nどちらを行いますか？");
   if (!mode) return;
 
-  if (mode === '1') {
+  const normalizedMode = mode.replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 65248));
+
+  if (normalizedMode === '1') {
     const name = prompt('名前を入力してください');
     if (!name) return;
     const balance = parseInt(prompt('初期残高は？', '0')) || 0;
@@ -235,7 +237,7 @@ addPersonBtn.addEventListener('click', async () => {
     await database.ref(`ledger/${group}/${name}`).set(newPerson);
     await database.ref(`ledgerNames/${group}/${name}`).set(true);
     renderLedger(group);
-  } else if (mode === '2') {
+  } else if (normalizedMode === '2') {
     const groupName = prompt('グループ名を入力してください');
     const members = prompt('グループに含める名前をカンマで区切って入力 (例：민아,영민)');
     if (!groupName || !members) return;
@@ -246,7 +248,7 @@ addPersonBtn.addEventListener('click', async () => {
       [`ledger/${group}/${groupName}`]: newPerson,
       [`ledgerNames/${group}/${groupName}`]: true
     };
-    members.split(',').map(n => n.trim()).forEach(name => {
+    members.split(/[,、]/).map(n => n.trim()).forEach(name => {
       updates[`nameAlias/${name}`] = groupName;
     });
     await database.ref().update(updates);
