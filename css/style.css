@@ -961,6 +961,13 @@ nav{
   line-height: 1.4;
 }
 
+.select-mode .send-checkbox {
+  display: none;
+}
+.delete-check {
+  accent-color: red;
+}
+
   /* -------------------------------------------------- */
   /* ✅ CAFE LEDGER 관련 스타일 */
   /* -------------------------------------------------- */

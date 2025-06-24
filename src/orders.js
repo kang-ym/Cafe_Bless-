@@ -6,6 +6,8 @@ import { getDatabase, ref, get, update, increment } from "https://www.gstatic.co
 const auth = getAuth();
 const db = getDatabase();
 let allOrderData = [];
+let filterSetupDone = false; // ✅ setupFilterButtons가 한 번만 실행되도록 제어
+
 
 onAuthStateChanged(auth, (user) => {
     if (!user) {
@@ -26,11 +28,26 @@ function loadOrders() {
     get(ordersRef).then(snapshot => {
         const data = snapshot.val();
         if (!data) return;
+
         allOrderData = Object.entries(data);
-        renderSummaryTable(allOrderData); // 기본은 전체 보기로 시작
-        setupFilterButtons();
+        renderSummaryTable(allOrderData); // ✅ 항상 전체 화면으로 시작
+
+        // ✅ 필터 버튼은 1번만 연결
+        if (!filterSetupDone) {
+            setupFilterButtons();
+            filterSetupDone = true;
+        }
+
+        // ✅ 모든 버튼에서 active 제거
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+
+        // ✅ 전체 버튼 active 설정
+        const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+        if (allBtn) allBtn.classList.add('active');
     }).catch(err => console.error('❌ 주문 불러오기 실패:', err));
 }
+
 
 function renderSummaryTable(orderArray) {
     const orderList = document.getElementById('orderList');
@@ -123,13 +140,41 @@ function renderOrders(orderArray) {
         return 0;
     });
 
-    const coffeeTitle = sorted[0]?.[1]?.coffeeJp || sorted[0]?.[1]?.coffee || '';
+    const orderList = document.getElementById('orderList');
+    orderList.innerHTML = '';
+
+    // ✅ 커피 이름 추출
+    let coffeeTitle = '';
+    if (orderArray.length > 0) {
+        const firstOrder = orderArray[0][1];
+        coffeeTitle = firstOrder.coffeeJp || firstOrder.coffee || '';
+    } else {
+        // ✅ orderArray가 비어 있을 경우 → 현재 active 버튼에서 이름 추출
+        const activeBtn = document.querySelector('.filter-btn.active');
+        coffeeTitle = activeBtn?.dataset.filter || '';
+    }
+
+    // ✅ 제목 추가 (주문 없어도 보여줌)
+    const title = document.createElement('h3');
+    title.className = 'order-title';
+    title.textContent = `☕ ${coffeeTitle}`;
+    orderList.appendChild(title);
+
+    if (sorted.length === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.textContent = '注文はありません。';
+        emptyMsg.style.textAlign = 'center';
+        orderList.appendChild(emptyMsg);
+        return;
+    }
+
+    // ✅ 주문 테이블 생성
     const table = document.createElement('table');
     table.className = 'order-table';
 
     let thead = `
         <thead>
-            <tr><th>温度</th><th>サイズ</th><th>名前</th><th>完了</th></tr>
+            <tr><th>削除</th><th>温度</th><th>サイズ</th><th>名前</th><th>完了</th></tr>
         </thead><tbody>
     `;
     let tbody = '';
@@ -139,6 +184,7 @@ function renderOrders(orderArray) {
         const sent = order.sentToLedger === true;
         tbody += `
             <tr id="order-${id}">
+                <td><button class="delete-btn" data-id="${id}">🗑</button></td>
                 <td>${hotOrCold}</td>
                 <td>${order.size}</td>
                 <td class="wide-name">
@@ -154,39 +200,72 @@ function renderOrders(orderArray) {
     });
 
     table.innerHTML = thead + tbody + '</tbody>';
-    const orderList = document.getElementById('orderList');
-    orderList.innerHTML = '';
-
-    // 커피 이름 제목 추가
-    const title = document.createElement('h3');
-    title.className = 'order-title';
-    title.textContent = `☕ ${coffeeTitle}`;
-    orderList.appendChild(title);
     orderList.appendChild(table);
+
+    setupDeleteButtons(); // 삭제 버튼 연결
 }
 
 function setupFilterButtons() {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    const buttons = document.querySelectorAll('.filter-btn');
+
+    buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
 
-            // 모든 버튼에서 active 제거
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            // 모든 버튼에서 active 제거 후 클릭한 버튼에 추가
+            buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
             const filtered = (filter === 'all')
                 ? allOrderData
                 : allOrderData.filter(([_, o]) => (o.coffeeJp || o.coffee) === filter);
-            (filter === 'all') ? renderSummaryTable(filtered) : renderOrders(filtered);
+
+            if (filter === 'all') {
+                renderSummaryTable(filtered);
+            } else {
+                renderOrders(filtered); // ← 필요 시 renderOrders(filtered, filter)도 가능
+            }
         });
     });
 }
 
-// ✅ 초기 진입 시 "전체" 버튼 강조
-window.addEventListener('DOMContentLoaded', () => {
-    const defaultBtn = document.querySelector('.filter-btn[data-filter="all"]');
-    if (defaultBtn) defaultBtn.classList.add('active');
-});
+
+function setupDeleteButtons() {
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            const confirmed = confirm("この注文を1つ削除しますか？");
+            if (!confirmed) return;
+
+            const today = new Date();
+            const dateKey = `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}`;
+            const orderRef = ref(db, `orders/${dateKey}/${id}`);
+            const snapshot = await get(orderRef);
+
+            if (!snapshot.exists()) {
+                alert("⚠️ 注文が存在しません");
+                return;
+            }
+
+            const order = snapshot.val();
+            const updates = {};
+
+            if (order.quantity && order.quantity > 1) {
+                updates[`orders/${dateKey}/${id}/quantity`] = order.quantity - 1;
+            } else {
+                updates[`orders/${dateKey}/${id}`] = null; // 완전 삭제
+            }
+
+            await update(ref(db), updates);
+
+            alert("✅ 注文を1つ削除しました");
+            loadOrders(); // 삭제 후 화면 갱신
+        });
+    });
+}
+
+
+
 
 // ✅ Ledger 전송 처리
 document.getElementById('sendToLedgerBtn')?.addEventListener('click', async () => {
