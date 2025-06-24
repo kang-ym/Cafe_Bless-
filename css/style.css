@@ -33,6 +33,15 @@ li{
 input[type = 'radio']{
     display: none;
 }
+select, input {
+      /* 💡 iOS 기본 스타일 제거 */
+      -webkit-appearance: auto;
+      appearance: auto;
+}
+input{
+  outline: transparent;
+  border: 1px solid var(--color-text);
+}
 
 /* common */
 body{
