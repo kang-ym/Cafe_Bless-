@@ -310,12 +310,14 @@ main{
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  padding-left: 20px;
 }
 
 .hot-block,
 .cold-block {
   display: flex;
+  justify-content: center;
   align-items: center;
   position: relative;
 }
@@ -371,7 +373,7 @@ main{
 .size-radio {
   display: flex;
   justify-content: center;
-  gap: 50px;
+  gap: 30px;
   padding: 20px 40px;
   width: 100%;
 }
@@ -405,35 +407,52 @@ main{
   text-align: center;
   width: 100%;
   margin-top: 10px;
+
+  >label{
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
 }
 
 .name-box {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 5px;
+  flex-direction: column;
   gap: 10px;
 }
 .name-box.has-name {
   justify-content: flex-start;
-  padding-left: 10px;
+  width: 100%;
 }
 
 #group {
   text-align: center;
-  width: 30%;
+  width: 70%;
   min-width: 100px;
+  font-size: 1.2rem;
+  
 }
 
 #nameBox {
-  width: 50%;
+  width: 100%;
+  min-width: 100px;
   text-align: center;
+  font-size: 1.2rem;
+
+  >select{
+    width: 70%;
+    min-width: 100px;
+    text-align: center;
+    font-size: 1.2rem;
+  }
 
 }
 #nameBox input {
   width: 100%;
   padding: 6px;
-  max-width: 150px;
+  min-width: 100px;
 }
 #customerName {
   width: 100%;
@@ -445,10 +464,19 @@ main{
   text-align: center;
   padding-top: 10px;
   width: 100%;
+
+  >label{
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
 }
 .coffee-quantity input {
   text-align: center;
-  width: 50px;
+  width: 70%;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 
