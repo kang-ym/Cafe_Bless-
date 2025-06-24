@@ -33,15 +33,7 @@ li{
 input[type = 'radio']{
     display: none;
 }
-select, input {
-      /* 💡 iOS 기본 스타일 제거 */
-      -webkit-appearance: none;
-      appearance: none;
-}
-input{
-  outline: transparent;
-  border: 1px solid var(--color-text);
-}
+
 
 /* common */
 body{
@@ -437,10 +429,13 @@ main{
 }
 
 #group {
+  display: block;
+  box-sizing: border-box;
   text-align: center;
-  width: 90%;
+  width: 90%; 
   min-width: 100px;
   font-size: 1.2rem;
+  margin-right: 30px;
   
 }
 
