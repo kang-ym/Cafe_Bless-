@@ -453,6 +453,8 @@ main{
   width: 100%;
   padding: 6px;
   min-width: 100px;
+  font-size: 1.2rem;
+  text-align: center;
 }
 #customerName {
   width: 100%;
@@ -1435,7 +1437,7 @@ footer{
         padding: 10px;
         background-color: transparent;
         opacity: 1;
-        font-size: 1rem;
+        font-size: 1.2rem;
         font-weight: bold;
         text-shadow:  0 0 0;
         border-radius: 0 0 0 0;
