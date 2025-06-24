@@ -922,6 +922,45 @@ nav{
   .order-box{
     margin-top: 10px;
   }
+
+  .order-filter-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+}
+.filter-btn {
+    padding: 6px 14px;
+    background-color: var(--color-accent-light);
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.order-title {
+  font-size: 1.4rem;
+  margin: 10px 0;
+  text-align: center;
+  color: var(--color-bg);
+}
+
+.filter-btn:hover {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+}
+
+.filter-btn.active {
+  background-color: var(--color-accent);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 5px var(--color-accent);
+}
+.order-table td{
+  line-height: 1.4;
+}
+
   /* -------------------------------------------------- */
   /* ✅ CAFE LEDGER 관련 스타일 */
   /* -------------------------------------------------- */
