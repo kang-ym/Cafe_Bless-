@@ -59,7 +59,7 @@
                 <!-- 오늘 하루 보지 않기 -->
                 <div class="do-not-show">
                     <input type="checkbox" id="hideToday">
-                    <label for="hideToday">오늘 하루 보지 않기</label>
+                    <label for="hideToday">今日は見ない</label>
                 </div>
             </div>
         </div>
@@ -206,4 +206,9 @@
 
 
 </body>
+<script>
+  document.querySelector('.use-btn').addEventListener('click', () => {
+    document.getElementById('useContainer').style.display = 'flex';
+  });
+</script>
 </html>
