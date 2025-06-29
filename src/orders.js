@@ -287,27 +287,45 @@ document.getElementById('sendToLedgerBtn')?.addEventListener('click', async () =
     const aliasMap = aliasSnap.val() || {};
     const updates = {};
 
-    checked.forEach(cb => {
+    for (const cb of checked){
         const id = cb.dataset.id;
         const order = orders[id];
         if (!order || order.sentToLedger === true) return;
-
+    
         const group = order.group || 'guest';
         const originalName = order.name;
         const realName = aliasMap[originalName] || originalName;
         const amount = -(order.price || 0);
-
+    
         const base = `ledger/${group}/${realName}`;
         const recordPath = `${base}/records/${dateKey}`;
-
-        updates[`${base}/balance`] = increment(amount);
-        updates[recordPath] = amount;
+        const balancePath = `${base}/balance`;
+    
+        // ✅ 잔액 차감
+        updates[balancePath] = increment(amount);
+    
+        // ✅ 주문 상태 업데이트
         updates[`orders/${dateKey}/${id}/sentToLedger`] = true;
-
+    
+        // ✅ ledgerNames 없으면 추가
         if (!ledgerNames?.[group]?.[realName]) {
             updates[`ledgerNames/${group}/${realName}`] = true;
         }
-    });
+    
+        // ✅ recordPath의 기존 값 가져와 배열로 누적
+        const recordRef = ref(db, recordPath);
+        const snapshot = await get(recordRef);
+        const existing = snapshot.val();
+    
+        const newValue = Array.isArray(existing)
+            ? [...existing, amount]
+            : (existing !== null ? [existing, amount] : [amount]);
+    
+        await update(ref(db), {
+            [recordPath]: newValue
+        });
+    };
+    
 
     await update(ref(db), updates);
 
