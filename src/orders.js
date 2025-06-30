@@ -8,6 +8,9 @@ const db = getDatabase();
 let allOrderData = [];
 let filterSetupDone = false; // ✅ setupFilterButtons가 한 번만 실행되도록 제어
 
+const selectedOrderIds = new Set(); // 체크한 주문 ID 저장용
+
+
 
 onAuthStateChanged(auth, (user) => {
     if (!user) {
@@ -192,8 +195,8 @@ function renderOrders(orderArray) {
                 </td>
                 <td>
                     ${sent
-                        ? '<span style="color: green; font-weight: bold;">送信完了</span>'
-                        : `<input type="checkbox" class="send-checkbox" data-id="${id}">`}
+                    ? '<span style="color: green; font-weight: bold;">送信完了</span>'
+                    : `<input type="checkbox" class="send-checkbox" data-id="${id}" ${selectedOrderIds.has(id) ? 'checked' : ''}>`}
                 </td>
             </tr>
         `;
@@ -202,6 +205,17 @@ function renderOrders(orderArray) {
     table.innerHTML = thead + tbody + '</tbody>';
     orderList.appendChild(table);
 
+    document.querySelectorAll('.send-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const id = cb.dataset.id;
+            if (cb.checked) {
+                selectedOrderIds.add(id);
+            } else {
+                selectedOrderIds.delete(id);
+            }
+        });
+    });
+    
     setupDeleteButtons(); // 삭제 버튼 연결
 }
 
@@ -276,8 +290,10 @@ document.getElementById('sendToLedgerBtn')?.addEventListener('click', async () =
     if (!ordersSnap.exists()) return alert("📦 注文が存在しません");
 
     const orders = ordersSnap.val();
-    const checked = document.querySelectorAll('.send-checkbox:checked');
-    if (checked.length === 0) return alert("☑ 完了チェックをした注文だけ送信できます。");
+    if (selectedOrderIds.size === 0) {
+        return alert("☑ 完了チェックをした注文だけ送信できます。");
+    }
+    
 
     const [ledgerSnap, aliasSnap] = await Promise.all([
         get(ref(db, 'ledgerNames')),
@@ -287,10 +303,9 @@ document.getElementById('sendToLedgerBtn')?.addEventListener('click', async () =
     const aliasMap = aliasSnap.val() || {};
     const updates = {};
 
-    for (const cb of checked){
-        const id = cb.dataset.id;
+    for (const id of selectedOrderIds){
         const order = orders[id];
-        if (!order || order.sentToLedger === true) return;
+        if (!order || order.sentToLedger === true) continue;
     
         const group = order.group || 'guest';
         const originalName = order.name;
@@ -329,13 +344,28 @@ document.getElementById('sendToLedgerBtn')?.addEventListener('click', async () =
 
     await update(ref(db), updates);
 
-    checked.forEach(cb => {
-        const row = cb.closest('tr');
-        if (row) {
-            const td = row.querySelector('td:last-child');
-            td.innerHTML = '<span style="color: green; font-weight: bold;">送信完了</span>';
-        }
-    });
+    // ✅ Ledger 전송 후 최신 주문 데이터 다시 불러오기
+const newSnap = await get(ordersRef);
+if (newSnap.exists()) {
+    allOrderData = Object.entries(newSnap.val());
+}
+
+    
+// ✅ 선택 ID 모두 제거
+selectedOrderIds.clear();
+
+// ✅ 현재 필터된 커피 다시 렌더링하여 UI 반영
+const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+const filtered = (activeFilter === 'all')
+    ? allOrderData
+    : allOrderData.filter(([_, o]) => (o.coffeeJp || o.coffee) === activeFilter);
+
+if (activeFilter === 'all') {
+    renderSummaryTable(filtered);
+} else {
+    renderOrders(filtered);
+}
+
 
     alert("✅ Ledger に送信しました！");
 });

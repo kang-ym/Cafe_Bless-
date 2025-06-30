@@ -192,7 +192,8 @@ orderBtn.addEventListener('click', () => {
     const name = getCustomerName();
     const group = groupSelect.value;
 
-    if (!name || !group) {
+
+    if (!name || !group ) {
         orderResult.innerHTML = '<div class="order-line">注文者情報を入力してください。</div>';
         return;
     }
