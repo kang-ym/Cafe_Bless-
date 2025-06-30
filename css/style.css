@@ -1206,7 +1206,14 @@ nav{
   color: #555;
 }
 
-  
+.move-charge-box {
+  margin-top: 6px;
+}
+.inviter-select {
+  font-size: 0.9rem;
+  margin-right: 4px;
+}
+
   
   /* -------------------------------------------------- */
   /* ✅ LUNCH LEDGER 관련 스타일 */

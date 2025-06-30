@@ -34,8 +34,15 @@ function formatDisplayDate(dateKey) {
 // ✅ 하나의 셀에 여러 금액 표시
 function formatRecordEntries(entries = []) {
   if (!Array.isArray(entries)) entries = [entries];
-  return entries.map(e => `${e > 0 ? '+' : ''}${e}`).join('<br>');
+  return entries.map(e => {
+    if (typeof e === 'string' && /^-?\d+G$/.test(e)) {
+      return `${e}`; // G가 붙은 문자열은 그대로 표시
+    }
+    const value = typeof e === 'number' ? e : parseInt(e);
+    return `${value > 0 ? '+' : ''}${value}`;
+  }).join('<br>');
 }
+
 
 // ✅ 해당 그룹 전체의 날짜 키 모으기
 function collectAllDates(groupData) {
@@ -107,8 +114,24 @@ async function renderLedger(groupName) {
 
     allDates.forEach(date => {
       const entries = person.records?.[date] || [];
-      rowHtml += `<td>${formatRecordEntries(entries) || '-'}</td>`;
-    });
+      const isToday = date === getTodayKey();
+      
+      let cellContent = formatRecordEntries(entries) || '-';
+  
+      if (groupName === 'guest' && isToday && entries.some(e => typeof e === 'number' && e < 0)) {
+          cellContent += `
+            <div class="move-charge-box">
+              <select class="inviter-select" data-person="${personName}">
+                <option value="">名前選択</option>
+              </select>
+              <button class="btn-move-charge" data-person="${personName}">移動</button>
+            </div>
+          `;
+      }
+  
+      rowHtml += `<td>${cellContent}</td>`;
+  });
+  
 
     // ✅ 게스트 이동 기능
     if (groupName === 'guest') {
@@ -126,6 +149,76 @@ async function renderLedger(groupName) {
 
     row.innerHTML = rowHtml;
     ledgerTableBody.appendChild(row);
+
+    // ✅ 이동 버튼 클릭 처리
+ledgerTableBody.querySelectorAll('.btn-move-charge').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const personName = btn.dataset.person;
+    const select = btn.previousElementSibling;
+    const inviterName = select?.value;
+    if (!inviterName) return alert('名前を選択してください');
+
+    const inviterGroupSnap = await database.ref('ledgerNames').once('value');
+    const inviterGroups = inviterGroupSnap.val() || {};
+    let targetGroup = null;
+    for (const group in inviterGroups) {
+      if (inviterGroups[group][inviterName]) {
+        targetGroup = group;
+        break;
+      }
+    }
+    if (!targetGroup) return alert("該当する人が見つかりません");
+
+    const todayKey = getTodayKey();
+    const guestRef = database.ref(`ledger/guest/${personName}`);
+    const guestSnap = await guestRef.once('value');
+    const guestData = guestSnap.val() || {};
+    const guestRecords = guestData.records || {};
+    const amountList = guestRecords[todayKey];
+    const originalAmount = amountList.find(v => typeof v === 'number' && v < 0);
+    if (!originalAmount) return alert("今日の差し引かれた金額が見つかりません");
+
+    guestRecords[todayKey] = [0];
+    await guestRef.update({ 
+      records: guestRecords,
+      balance: 0
+    });
+
+    const inviterRef = database.ref(`ledger/${targetGroup}/${inviterName}`);
+    const inviterSnap = await inviterRef.once('value');
+    const inviterData = inviterSnap.val() || {};
+    const inviterBalance = inviterData.balance || 0;
+    const inviterRecords = inviterData.records || {};
+    const inviterToday = inviterRecords[todayKey] || [];
+    inviterToday.push(`${originalAmount}G`);
+    inviterRecords[todayKey] = inviterToday;
+
+    await inviterRef.set({
+      balance: inviterBalance + originalAmount,
+      records: inviterRecords
+    });
+
+    alert(`${personName}さんのコーヒー代が ${inviterName} さんに移動されました。`);
+    await renderLedger('guest');
+  });
+});
+
+// ✅ 드롭다운에 이름 채워 넣기
+const inviterSelects = ledgerTableBody.querySelectorAll('.inviter-select');
+const nameSnap = await database.ref('ledgerNames').once('value');
+const nameData = nameSnap.val() || {};
+
+inviterSelects.forEach(select => {
+  for (const group in nameData) {
+    for (const name in nameData[group]) {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = `${name}（${group}）`;
+      select.appendChild(opt);
+    }
+  }
+});
+
 
     // ✅ 그룹 멤버 보기 토글
     row.querySelector('.show-members-btn')?.addEventListener('click', () => {
@@ -272,8 +365,13 @@ function applyLedgerNameClass() {
   else ths[0]?.classList.add('ledger-name');
 }
 
+
 // ✅ 초기화 실행
-document.addEventListener('DOMContentLoaded', () => {
+window.onload = () => {
+    // ✅ 첫 탭을 명시적으로 active로
+    const firstTab = document.querySelector('.cafe-ledger-tab a[data-group="信仰"]');
+    firstTab?.classList.add('active');
+
   renderLedger("信仰");
   applyLedgerNameClass();
-});
+};
