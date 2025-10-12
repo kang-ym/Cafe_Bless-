@@ -12,6 +12,8 @@ const deleteBtn = document.getElementById('lunch-ledger-btn-delete');
 
 let currentGroup = '信仰';
 let selectionMode = false;
+const LUNCH_DEDUCT = 250;           // 차감 금액(円)
+const LOW_BALANCE_THRESHOLD = 200;  // 잔액 경고 기준(円)
 
 function getTodayKey() {
   const today = new Date();
@@ -55,7 +57,7 @@ function renderBody(data, allDates, group) {
     tr.className = 'lunch-ledger-row';
 
     const balance = info.balance || 0;
-    const balanceClass = balance <= 200 ? 'lunch-ledger-balance low' : 'lunch-ledger-balance';
+    const balanceClass = balance <= LOW_BALANCE_THRESHOLD ? 'lunch-ledger-balance low' : 'lunch-ledger-balance';
 
     const cells = [];
 
@@ -69,7 +71,7 @@ function renderBody(data, allDates, group) {
       <td>
         <input type="number" class="lunch-ledger-input charge-input" placeholder="金額">
         <button class="lunch-ledger-charge" data-name="${name}" data-group="${group}">チャージ</button>
-        <button class="lunch-ledger-confirm" data-name="${name}" data-group="${group}">-200</button>
+        <button class="lunch-ledger-confirm" data-name="${name}" data-group="${group}">-${LUNCH_DEDUCT}</button>
       </td>
     `);
 
@@ -125,7 +127,7 @@ function attachEventHandlers(group) {
   document.querySelectorAll('.lunch-ledger-confirm').forEach(btn => {
     btn.addEventListener('click', () => {
       const name = btn.dataset.name;
-      const amount = -200;
+      const amount = -LUNCH_DEDUCT;
       const today = getTodayKey();
       const userRef = ref(db, `lunchLedger/${group}/${name}`);
 
