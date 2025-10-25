@@ -46,6 +46,7 @@ function updateCoffeeSelection() {
             : '3px 3px 10px var(--color-text)';
     });
     updateHotRadioAvailability();
+    updateSizeSelection();
 }
 
 // ✅ 여름 계절용 제한: 아메리카노 외에는 hot 선택 불가
@@ -56,17 +57,54 @@ function updateHotRadioAvailability() {
     const hotBlock = document.querySelector('.hot-block');
     const coldBlock = document.querySelector('.cold-block');
 
-    if (selectedCoffee && selectedCoffee !== 'americano') {
-        // 🔥 HOT 비활성화
+    if (selectedCoffee && selectedCoffee === 'cocoa'){
         hotInput.style.display = 'none';
         hotBlock.style.display = 'none';  // ✅ 🔥 블록 자체 숨김
         coldInput.checked = true;         // ❄️ 자동 선택
         updateHotColdSelection();
-    } else {
-        // 🔥 HOT 다시 표시
+    } else{
         hotInput.style.display = '';
         hotBlock.style.display = '';
     }
+
+    // 여름용 라떼 hot 안보이게 
+    // if (selectedCoffee && selectedCoffee !== 'americano') {
+    //     // 🔥 HOT 비활성화
+    //     hotInput.style.display = 'none';
+    //     hotBlock.style.display = 'none';  // ✅ 🔥 블록 자체 숨김
+    //     coldInput.checked = true;         // ❄️ 자동 선택
+    //     updateHotColdSelection();
+    // } else {
+    //     // 🔥 HOT 다시 표시
+    //     // hotInput.style.display = '';
+    //     // hotBlock.style.display = '';
+    // }
+    // 겨울용 라때 hot 일때 사이즈 R 만 
+    const largeOption = document.getElementById('largeOption');
+    const regularOption = document.getElementById('regularOption');
+    const LBlock = document.querySelector('.L-block');
+
+    const isLatte =
+        selectedCoffee == 'latte' ||
+        selectedCoffee == 'vanilla-latte' ||
+        selectedCoffee == 'caramel-latte';
+
+    if (isLatte && hotInput.checked) {
+        // L 비활성화 + 숨김, R로 강제 전환
+        largeOption.disabled = true;
+        largeOption.checked = false;
+        if (LBlock) LBlock.style.display = 'none';
+
+        // R는 항상 선택 가능
+        regularOption.disabled = false;
+        if (!regularOption.checked) regularOption.checked = true;
+    } else {
+        // 원상복구: L 다시 보이게 + 선택 가능
+        largeOption.disabled = false;
+        regularOption.disabled = false;
+        if (LBlock) LBlock.style.display = '';
+    }
+    updateSizeSelection();
 }
 
 
@@ -91,7 +129,10 @@ function updateHotColdSelection() {
         }
     }
 }
-hotRadios.forEach(radio => radio.addEventListener('change', updateHotColdSelection));
+hotRadios.forEach(radio => radio.addEventListener('change', () => {
+    updateHotColdSelection();
+    updateHotRadioAvailability(); // 🔁 온도 변경 시 사이즈 제한/복구 동기화
+}));
 updateHotColdSelection();
 
 

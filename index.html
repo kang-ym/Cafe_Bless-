@@ -87,6 +87,7 @@
 
             <div class="coffee-container">
                 <div class="select-box">
+                    <!-- アメリカーノ -->
                     <div class="coffe-box">
                         <input type="radio" name="coffee" value="americano" id="americano" checked>
                         <label for="americano">
@@ -99,7 +100,8 @@
                             </div>
                         </label>
                         <p class="Price" data-pricer="200" data-pricel="300">L : 300円 R : 200円</p>    
-                    </div>
+                    </div><!-- /アメリカーノ -->
+                    <!-- ラテ -->
                     <div class="coffe-box">
                         <input type="radio" name="coffee" value="latte" id="latte">
                         <label for="latte">
@@ -112,7 +114,8 @@
                             </div>
                         </label>
                         <p class="Price" data-pricer="200" data-pricel="300">L : 300円 R : 200円</p>    
-                    </div>
+                    </div><!-- /ラテ -->
+                    <!-- バニララテ -->
                     <div class="coffe-box">
                         <input type="radio" name="coffee" value="vanilla-latte" id="vanillaLatte">
                         <label for="vanillaLatte">
@@ -125,7 +128,8 @@
                             </div>
                         </label>
                         <p class="Price" data-pricer="250" data-pricel="350">L : 350円 R : 250円</p>    
-                    </div>
+                    </div><!-- /バニララテ -->
+                    <!-- キャラメルラテ -->
                     <div class="coffe-box">
                         <input type="radio" name="coffee" value="caramel-latte" id="caramelLatte">
                         <label for="caramelLatte">
@@ -138,29 +142,41 @@
                             </div>
                         </label>
                         <p class="Price" data-pricer="250" data-pricel="350">L : 350円 R : 250円</p>    
-                    </div>
+                    </div><!-- /キャラメルラテ -->
+                    <!-- ココア -->
+                    <div class="coffe-box">
+                        <input type="radio" name="coffee" value="cocoa" id="cocoa">
+                        <label for="cocoa">
+                            <div class="img-box">
+                                <h3 data-en="Caramel Latte">
+                                    <span class="custom-check"></span>
+                                    ココア
+                                </h3>
+                                <img src="./img/4.webp" alt="" style="object-position: center -150px;">
+                            </div>
+                        </label>
+                        <p class="Price" data-pricer="250" data-pricel="350">L : 300円 R : 200円</p>    
+                    </div><!-- /ココア -->
                 </div>
                 <div class="info-box">
                     <div class="hot-radio input-box">
-                        <label for="hotOption" class="hot-block ㅁㅊ">
-                          <i class="fa-solid fa-fire"></i>
-                          <span class="hot-text temp-text">HOT</span>
+                        <label for="hotOption" class="hot-block">
+                            <i class="fa-solid fa-fire"></i>
+                            <span class="hot-text temp-text">HOT</span>
                         </label>
                         <input type="radio" name="temperature" value="hot" id="hotOption" checked>
-                      
                         <input type="radio" name="temperature" value="cold" id="coldOption">
                         <label for="coldOption" class="cold-block">
-                          <i class="fa-regular fa-snowflake"></i>
-                          <span class="cold-text temp-text">COLD</span>
+                            <i class="fa-regular fa-snowflake"></i>
+                            <span class="cold-text temp-text">COLD</span>
                         </label>
-                      </div>
-                      
+                    </div>
                     
                     <div class="size-radio input-box">
                         <input type="radio" name="size" value="L" id="largeOption" checked>
-                        <label for="largeOption">L</label>
+                        <label for="largeOption" class="L-block">L</label>
                         <input type="radio" name="size" value="R" id="regularOption" >
-                        <label for="regularOption">R</label>
+                        <label for="regularOption" class="R-block">R</label>
 
                     </div>
                     <div class="customer-name input-box">
