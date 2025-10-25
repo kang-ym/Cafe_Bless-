@@ -1,5 +1,9 @@
 'use strict';
 
+const DEDUCT_100 = 100;           // 차감 금액(円)
+const DEDUCT_50 = 50;           // 차감 금액(円)
+
+
 const database = window.database;
 
 // ✅ 주요 요소 가져오기
@@ -109,7 +113,11 @@ async function renderLedger(groupName) {
 
     rowHtml += `
       <td class="ledger-balance ${balanceClass}">${person.balance}</td>
-      <td><button class="ledger-btn-charge" data-name="${personName}">+</button></td>
+      <td>
+      <button class="ledger-btn-charge" data-name="${personName}">+</button>
+      <button class="ledger-btn-confirm" data-name="${personName}" data-amount="-100">-${DEDUCT_100}</button>
+      <button class="ledger-btn-confirm" data-name="${personName}" data-amount="-50">-${DEDUCT_50}</button>
+      </td>
     `;
 
     allDates.forEach(date => {
@@ -239,10 +247,88 @@ inviterSelects.forEach(select => {
           const current = records[todayKey];
           const newRecords = Array.isArray(current) ? [...current, amount] : (typeof current === 'number' ? [current, amount] : [amount]);
           records[todayKey] = newRecords;
-          personRef.set({ balance, records }).then(() => renderLedger(groupName));
+          personRef.set({ balance, records }).then(() => {
+            // ✅ 부분 갱신: 잔액 + 오늘 셀만 업데이트
+            const balanceCell = row.querySelector('.ledger-balance');
+            if (balanceCell) balanceCell.textContent = balance;
+
+            const header = document.querySelector('#ledger-table-head-row');
+            if (header) {
+              const todayDisplay = formatDisplayDate(todayKey);
+              let todayColIndex = -1;
+              header.querySelectorAll('th').forEach((th, i) => {
+                if ((th.textContent || '').trim() === todayDisplay) todayColIndex = i;
+              });
+
+              if (todayColIndex >= 0) {
+                const tds = row.querySelectorAll('td');
+                const todayCell = tds[todayColIndex];
+                if (todayCell) {
+                  todayCell.innerHTML = formatRecordEntries(newRecords) || '-';
+                }
+              }
+            }
+          });
         });
       }
     });
+
+    // ✅ 차감 버튼
+    // ✅ 차감 버튼: 이벤트 위임으로 한 번만 부착 (renderLedger 안에서 row마다 리스너 붙이지 않기)
+    row.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.ledger-btn-confirm');
+      if (!btn) return;
+    
+      const name = btn.dataset.name;
+      if (!name) return;
+    
+      // 버튼 텍스트에서 금액 파싱: "-100" 또는 "-50"
+      const raw = (btn.textContent || '').trim();
+      const amount = parseInt(btn.dataset.amount, 10);
+      if (Number.isNaN(amount)) return;
+    
+      const todayKey = getTodayKey();
+      const personRef = database.ref(`ledger/${groupName}/${name}`);
+    
+      const snap = await personRef.once('value');
+      const data = snap.val() || {};
+      const newBalance = (data.balance || 0) + amount;
+    
+      const records = data.records || {};
+      const current = records[todayKey];
+      const newList = Array.isArray(current)
+        ? [...current, amount]
+        : (typeof current === 'number' ? [current, amount] : [amount]);
+    
+      records[todayKey] = newList;
+    
+      await personRef.set({ balance: newBalance, records });
+    
+      // ✅ 부분 갱신: 잔액 + 오늘 셀만 업데이트
+      const balanceCell = row.querySelector('.ledger-balance');
+      if (balanceCell) balanceCell.textContent = newBalance;
+        
+      // 헤더에서 '오늘' 열 index 찾기 → 행의 동일 index 셀 갱신
+      const ths = document.querySelectorAll('#lunch-ledger-table-head-row, #ledger-table-head-row');
+      // 위 줄은 점심/카페 공용 대응용. 실제로는 '#ledger-table-head-row'만 써도 됨.
+      const header = document.querySelector('#ledger-table-head-row');
+      if (header) {
+        const todayDisplay = formatDisplayDate(todayKey);
+        let todayColIndex = -1;
+        header.querySelectorAll('th').forEach((th, i) => {
+          if ((th.textContent || '').trim() === todayDisplay) todayColIndex = i;
+        });
+      
+        if (todayColIndex >= 0) {
+          const tds = row.querySelectorAll('td');
+          const todayCell = tds[todayColIndex];
+          if (todayCell) {
+            todayCell.innerHTML = formatRecordEntries(newList) || '-';
+          }
+        }
+      }
+    });
+
 
     // ✅ 이동 버튼 처리
     row.querySelector('.move-btn')?.addEventListener('click', async () => {
