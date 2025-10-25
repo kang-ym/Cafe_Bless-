@@ -1066,7 +1066,17 @@ nav{
     color: red;
     font-weight: bold;
   }
-  
+  .ledger-btn-box{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    min-height: 100%;
+  }
+
+
   .ledger-btn-charge {
     padding: 4px 10px;
     border-radius: 5px;
@@ -1078,6 +1088,18 @@ nav{
   
   .ledger-btn-charge:hover {
     background-color: #45a049;
+  }
+  .ledger-btn-confirm {
+    padding: 4px 10px;
+    border-radius: 5px;
+    background-color: #604caf;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .ledger-btn-confirm:hover {
+    background-color: #4e45a0;
   }
   
   #ledger-btn-add-person {

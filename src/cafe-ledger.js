@@ -114,9 +114,11 @@ async function renderLedger(groupName) {
     rowHtml += `
       <td class="ledger-balance ${balanceClass}">${person.balance}</td>
       <td>
-      <button class="ledger-btn-charge" data-name="${personName}">+</button>
-      <button class="ledger-btn-confirm" data-name="${personName}" data-amount="-100">-${DEDUCT_100}</button>
-      <button class="ledger-btn-confirm" data-name="${personName}" data-amount="-50">-${DEDUCT_50}</button>
+        <div class="ledger-btn-box">
+          <button class="ledger-btn-charge" data-name="${personName}">+チャージ</button>
+          <button class="ledger-btn-confirm" data-name="${personName}" data-amount="-100">-${DEDUCT_100}</button>
+          <button class="ledger-btn-confirm" data-name="${personName}" data-amount="-50">-${DEDUCT_50}</button>
+        </div>
       </td>
     `;
 
