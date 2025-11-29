@@ -923,6 +923,11 @@ nav{
     margin-top: 10px;
   }
 
+ .filter-container{
+  display: flex;
+  justify-content: space-between;
+ }
+
   .order-filter-btns {
     display: flex;
     flex-wrap: wrap;

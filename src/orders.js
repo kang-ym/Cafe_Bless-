@@ -146,6 +146,9 @@ function renderOrders(orderArray) {
     const orderList = document.getElementById('orderList');
     orderList.innerHTML = '';
 
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    let allOrders = [];
+    
     // ✅ 커피 이름 추출
     let coffeeTitle = '';
     if (orderArray.length > 0) {
@@ -170,6 +173,8 @@ function renderOrders(orderArray) {
         orderList.appendChild(emptyMsg);
         return;
     }
+
+    
 
     // ✅ 주문 테이블 생성
     const table = document.createElement('table');

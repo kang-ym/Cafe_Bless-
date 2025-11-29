@@ -66,7 +66,7 @@ function updateHotRadioAvailability() {
         hotInput.style.display = '';
         hotBlock.style.display = '';
     }
-
+ 
     // 여름용 라떼 hot 안보이게 
     // if (selectedCoffee && selectedCoffee !== 'americano') {
     //     // 🔥 HOT 비활성화
@@ -85,6 +85,7 @@ function updateHotRadioAvailability() {
     const LBlock = document.querySelector('.L-block');
 
     const isLatte =
+        selectedCoffee == 'americano' ||
         selectedCoffee == 'latte' ||
         selectedCoffee == 'vanilla-latte' ||
         selectedCoffee == 'caramel-latte';
