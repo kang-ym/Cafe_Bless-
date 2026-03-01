@@ -8,20 +8,20 @@
     /*--color-bg: #F9F5F1;  /* 크림 아이보리(Cream Ivory): 부드럽고 따뜻한 느낌의 배경색  */
 
         /* color - White Christmas ver. */
-        /*--color-text: #3B2A28;          /* 진한 초코 브라운: 로고/텍스트용 */
-        /*--color-primary: #30534A;       /* 딥 파인그린: 상단 박스, 버튼 등 메인 컬러 */
-        /*--color-primary-light: #E3EEF0; /* 눈빛이 도는 연한 블루그린 톤 배경 */
-        /*--color-accent: #E57373;        /* 따뜻한 크리스마스 레드: 강조 버튼 */
-        /*--color-accent-light: #FFE3E3;  /* 연한 핑크 눈빛: 서브 강조 영역 */
-        /*--color-bg: #FFF9F3;            /* 눈+따뜻한 조명 느낌의 아이보리 화이트 배경 */
+        /*--color-text: #3A3330;          /* 살짝 브라운 섞인 다크 컬러 (글자, 로고) */
+        /*--color-primary: #B71C1C;       /* 딥 크리스마스 레드 (주요 버튼/강조 박스) */
+        /*--color-primary-light: #FCEEEF; /* 아주 연한 핑크 레드 톤 배경 (설명 박스 등) */
+        /*--color-accent: #D32F2F;        /* 포인트 레드 (호버, 강조 버튼, 테두리) */
+        /*--color-accent-light: #FFCDD2;  /* 연핑크 하이라이트 (테이블 헤더, 배경) */
+        /*--color-bg: #FFFAF7;            /* 눈 + 따뜻한 조명 느낌의 크림 화이트 배경 */
 
-
+        /* 봄(벚꽃) */
         --color-text: #3A3330;          /* 살짝 브라운 섞인 다크 컬러 (글자, 로고) */
-        --color-primary: #B71C1C;       /* 딥 크리스마스 레드 (주요 버튼/강조 박스) */
-        --color-primary-light: #FCEEEF; /* 아주 연한 핑크 레드 톤 배경 (설명 박스 등) */
-        --color-accent: #D32F2F;        /* 포인트 레드 (호버, 강조 버튼, 테두리) */
-        --color-accent-light: #FFCDD2;  /* 연핑크 하이라이트 (테이블 헤더, 배경) */
-        --color-bg: #FFFAF7;            /* 눈 + 따뜻한 조명 느낌의 크림 화이트 배경 */
+        --color-primary: #FF8FA3;       /* 벚꽃 핑크 (주요 버튼/강조 박스) */
+        --color-primary-light: #FFF1F5; /* 아주 연한 벚꽃 톤 배경 (설명 박스 등) */
+        --color-accent: #FF5C7A;        /* 포인트 핑크 (호버, 강조 버튼, 테두리) */
+        --color-accent-light: #FFD6DF;  /* 연핑크 하이라이트 (테이블 헤더, 배경) */
+        --color-bg: #FFFBFC;            /* 아주 연한 화이트 핑크 배경 */
 
     /* font */
     --font-logo : "Imperial Script", cursive;
@@ -80,37 +80,88 @@ body{
     overflow: hidden;
 }
 
+/* ❄️ Winter Background (commented) */
+/*
 .mobile-container::before{
     content: '';
     position: absolute;
     inset: 0;
     background: url(../img/Christmas-background.jpg) no-repeat center center / cover;
+    opacity: 0.35;
+    z-index: 0;
+}
+*/
+.mobile-container::before{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255, 235, 240, 0.9), rgba(255, 255, 255, 0.7)),
+      url(../img/Cherry-blossom-background.jpg) no-repeat center center / cover;
     opacity: 0.35; /* 여기 값으로 투명도 조절 (0 ~ 1) */
     z-index: 0;
 }
-
-/* 눈 내리는 효과 레이어 */
+ 
+/* ❄️ Snow Falling Effect (commented) */
+/*
 .mobile-container::after{
   content: '';
   position: absolute;
-  inset: -100px 0 0 0; /* 위쪽에서 내려오게 여유를 줌 */
+  inset: -100px 0 0 0;
   pointer-events: none;
   background-image:
     radial-gradient(10px 10px at 10px 10px,  rgba(255,255,255,0.9) 50%, transparent 50%),
     radial-gradient(2px 2px at 50px 30px,  rgba(255,255,255,0.8) 50%, transparent 50%),
     radial-gradient(3px 3px at 130px 80px, rgba(255,255,255,0.9) 50%, transparent 50%),
     radial-gradient(2px 2px at 200px 50px, rgba(255,255,255,0.8) 50%, transparent 50%);
-  background-size: 200px 200px; /* 눈 사이 간격 */
-  opacity: 0.9;                 /* 눈 밝기/진하기 */
+  background-size: 200px 200px;
+  opacity: 0.9;
   animation: snow-fall 12s linear infinite;
-  z-index: 0; /* 배경(::before) 위, 내용보다 아래 */
+  z-index: 0;
 }
+*/
+/* 벚꽃(꽃잎) 떨어지는 효과 레이어 */
+.mobile-container::after{
+  content: '';
+  position: absolute;
+  inset: -140px 0 0 0; /* 위쪽에서 내려오게 여유를 줌 */
+  pointer-events: none;
+
+  /* 꽃잎 패턴(핑크 계열) */
+  background-image:
+    radial-gradient(6px 10px at 20px 20px,  rgba(255, 170, 185, 0.85) 45%, transparent 46%),
+    radial-gradient(5px 9px  at 80px 50px,  rgba(255, 140, 165, 0.75) 45%, transparent 46%),
+    radial-gradient(7px 11px at 140px 90px, rgba(255, 190, 205, 0.80) 45%, transparent 46%),
+    radial-gradient(4px 8px  at 210px 40px, rgba(255, 155, 180, 0.70) 45%, transparent 46%),
+    radial-gradient(6px 10px at 260px 120px, rgba(255, 200, 215, 0.75) 45%, transparent 46%);
+
+  background-size: 320px 260px; /* 꽃잎 사이 간격 */
+  opacity: 0.85;               /* 꽃잎 밝기/진하기 */
+  animation: sakura-fall 10s linear infinite;
+  z-index: 0; /* 배경(::before) 위, 내용보다 아래 */
+  filter: blur(0.2px);
+}
+
+/* ❄️ Snow Animation (commented) */
+/*
 @keyframes snow-fall {
   0% {
     transform: translateY(-100px);
   }
   100% {
     transform: translateY(200px);
+  }
+}
+*/
+@keyframes sakura-fall {
+  0% {
+    transform: translateY(-120px) translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(60px) translateX(-18px) rotate(90deg);
+  }
+  100% {
+    transform: translateY(260px) translateX(12px) rotate(180deg);
   }
 }
 
