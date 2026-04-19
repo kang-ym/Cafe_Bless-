@@ -16,12 +16,20 @@
         /*--color-bg: #FFFAF7;            /* 눈 + 따뜻한 조명 느낌의 크림 화이트 배경 */
 
         /* 봄(벚꽃) */
-        --color-text: #3A3330;          /* 살짝 브라운 섞인 다크 컬러 (글자, 로고) */
-        --color-primary: #FF8FA3;       /* 벚꽃 핑크 (주요 버튼/강조 박스) */
-        --color-primary-light: #FFF1F5; /* 아주 연한 벚꽃 톤 배경 (설명 박스 등) */
-        --color-accent: #FF5C7A;        /* 포인트 핑크 (호버, 강조 버튼, 테두리) */
-        --color-accent-light: #FFD6DF;  /* 연핑크 하이라이트 (테이블 헤더, 배경) */
-        --color-bg: #FFFBFC;            /* 아주 연한 화이트 핑크 배경 */
+        /*--color-text: #3A3330;*/          /* 살짝 브라운 섞인 다크 컬러 (글자, 로고) */
+        /*--color-primary: #FF8FA3;*/       /* 벚꽃 핑크 (주요 버튼/강조 박스) */
+        /*--color-primary-light: #FFF1F5;*/ /* 아주 연한 벚꽃 톤 배경 (설명 박스 등) */
+        /*--color-accent: #FF5C7A;*/        /* 포인트 핑크 (호버, 강조 버튼, 테두리) */
+        /*--color-accent-light: #FFD6DF;*/  /* 연핑크 하이라이트 (테이블 헤더, 배경) */
+        /*--color-bg: #FFFBFC;*/            /* 아주 연한 화이트 핑크 배경 */
+
+        /* 여름(바다) */
+        --color-text: #2F4858;          /* 차분한 딥 블루그레이 텍스트 */
+        --color-primary: #4DB6D6;       /* 시원한 오션 블루 */
+        --color-primary-light: #E6F7FB; /* 밝은 하늘/바다 톤 배경 */
+        --color-accent: #1E88A8;        /* 진한 바다색 포인트 */
+        --color-accent-light: #BFEAF4;  /* 연한 민트블루 하이라이트 */
+        --color-bg: #F7FDFF;            /* 아주 연한 여름 하늘 배경 */
 
     /* font */
     --font-logo : "Imperial Script", cursive;
@@ -91,15 +99,27 @@ body{
     z-index: 0;
 }
 */
-.mobile-container::before{
+/* 봄 */
+/* .mobile-container::before{
     content: '';
     position: absolute;
     inset: 0;
     background:
       linear-gradient(180deg, rgba(255, 235, 240, 0.9), rgba(255, 255, 255, 0.7)),
       url(../img/Cherry-blossom-background.jpg) no-repeat center center / cover;
-    opacity: 0.35; /* 여기 값으로 투명도 조절 (0 ~ 1) */
+    opacity: 0.35;
     z-index: 0;
+} */
+/* 여름 */
+.mobile-container::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(220, 245, 252, 0.88), rgba(255, 255, 255, 0.72)),
+    url(../img/Summer-background.png) no-repeat center center / cover;
+  opacity: 0.8; /* 여기 값으로 투명도 조절 (0 ~ 1) */
+  z-index: 0;
 }
  
 /* ❄️ Snow Falling Effect (commented) */
@@ -121,13 +141,12 @@ body{
 }
 */
 /* 벚꽃(꽃잎) 떨어지는 효과 레이어 */
-.mobile-container::after{
+/* .mobile-container::after{
   content: '';
   position: absolute;
-  inset: -140px 0 0 0; /* 위쪽에서 내려오게 여유를 줌 */
+  inset: -140px 0 0 0;
   pointer-events: none;
 
-  /* 꽃잎 패턴(핑크 계열) */
   background-image:
     radial-gradient(6px 10px at 20px 20px,  rgba(255, 170, 185, 0.85) 45%, transparent 46%),
     radial-gradient(5px 9px  at 80px 50px,  rgba(255, 140, 165, 0.75) 45%, transparent 46%),
@@ -135,11 +154,31 @@ body{
     radial-gradient(4px 8px  at 210px 40px, rgba(255, 155, 180, 0.70) 45%, transparent 46%),
     radial-gradient(6px 10px at 260px 120px, rgba(255, 200, 215, 0.75) 45%, transparent 46%);
 
-  background-size: 320px 260px; /* 꽃잎 사이 간격 */
-  opacity: 0.85;               /* 꽃잎 밝기/진하기 */
+  background-size: 320px 260px;
+  opacity: 0.85;  
   animation: sakura-fall 10s linear infinite;
-  z-index: 0; /* 배경(::before) 위, 내용보다 아래 */
+  z-index: 0; 
   filter: blur(0.2px);
+} */
+ /* 여름 */
+ .mobile-container::after{
+  content: '';
+  position: absolute;
+  inset: -140px 0 0 0;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(10px 10px at 30px 30px, rgba(255, 255, 255, 0.75) 40%, transparent 41%),
+    radial-gradient(6px 6px at 90px 80px, rgba(191, 234, 244, 0.65) 45%, transparent 46%),
+    radial-gradient(8px 8px at 160px 40px, rgba(255, 255, 255, 0.7) 40%, transparent 41%),
+    radial-gradient(5px 5px at 230px 120px, rgba(173, 216, 230, 0.55) 45%, transparent 46%),
+    radial-gradient(7px 7px at 290px 70px, rgba(255, 255, 255, 0.65) 40%, transparent 41%);
+
+  background-size: 320px 260px;
+  opacity: 0.7;
+  animation: summer-float 12s linear infinite;
+  z-index: 0;
+  filter: blur(0.4px);
 }
 
 /* ❄️ Snow Animation (commented) */
@@ -153,7 +192,8 @@ body{
   }
 }
 */
-@keyframes sakura-fall {
+/* 봄 */
+/* @keyframes sakura-fall {
   0% {
     transform: translateY(-120px) translateX(0) rotate(0deg);
   }
@@ -162,6 +202,18 @@ body{
   }
   100% {
     transform: translateY(260px) translateX(12px) rotate(180deg);
+  }
+} */
+ /* 여름 */
+ @keyframes summer-float {
+  0% {
+    transform: translateY(-120px) translateX(0);
+  }
+  50% {
+    transform: translateY(80px) translateX(10px);
+  }
+  100% {
+    transform: translateY(260px) translateX(-8px);
   }
 }
 
