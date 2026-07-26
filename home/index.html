@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="jp">
+<html lang="ja">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +25,7 @@
         <script type="module" src="../src/logout.js"></script>
         <!-- Java script -->
         <script type="module" src="../src/auth-check.js" defer></script>
+        <script src="../src/menu-manager.js" defer></script>
 
 
         <!-- css -->
@@ -63,6 +64,131 @@
             <div class="home-img-box">
                 <img src="/img/manager.png" alt="매니저 캐릭터">
             </div>
+
+            <section class="menu-manager-box">
+                <h2>☕ メニュー管理</h2>
+            
+                <form id="menuForm" class="menu-manager-form">
+                    <input type="hidden" id="menuId">
+            
+                    <div class="menu-form-item">
+                        <label for="menuName">メニュー名</label>
+                        <input
+                            type="text"
+                            id="menuName"
+                            placeholder="例：アメリカーノ"
+                            required
+                        >
+                    </div>
+                    <div class="menu-form-item">
+                        <label for="menuNameEn">英語メニュー名</label>
+                        <input
+                            type="text"
+                            id="menuNameEn"
+                            placeholder="例：Americano"
+                            required
+                        >
+                    </div>
+            
+                    <div class="menu-price-box">
+                        <div class="menu-form-item">
+                            <label for="menuPriceR">Rサイズ価格</label>
+                            <input
+                                type="number"
+                                id="menuPriceR"
+                                min="0"
+                                placeholder="200"
+                                required
+                            >
+                        </div>
+            
+                        <div class="menu-form-item">
+                            <label for="menuPriceL">Lサイズ価格</label>
+                            <input
+                                type="number"
+                                id="menuPriceL"
+                                min="0"
+                                placeholder="300"
+                                required
+                            >
+                        </div>
+                    </div>
+            
+                    <div class="menu-temperature-size-box">
+                        <div class="menu-check-box">
+                            <strong>HOT</strong>
+                    
+                            <label>
+                                <input type="checkbox" id="menuHot" checked>
+                                販売
+                            </label>
+                    
+                            <span>サイズ</span>
+                    
+                            <label>
+                                <input type="checkbox" id="menuHotSizeR" checked>
+                                R
+                            </label>
+                    
+                            <label>
+                                <input type="checkbox" id="menuHotSizeL" checked>
+                                L
+                            </label>
+                        </div>
+                    
+                        <div class="menu-check-box">
+                            <strong>COLD</strong>
+                    
+                            <label>
+                                <input type="checkbox" id="menuCold" checked>
+                                販売
+                            </label>
+                    
+                            <span>サイズ</span>
+                    
+                            <label>
+                                <input type="checkbox" id="menuColdSizeR" checked>
+                                R
+                            </label>
+                    
+                            <label>
+                                <input type="checkbox" id="menuColdSizeL" checked>
+                                L
+                            </label>
+                        </div>
+                    </div>
+            
+                    <div class="menu-check-box">
+                        <label>
+                            <input type="checkbox" id="menuActive" checked>
+                            販売中
+                        </label>
+                    </div>
+            
+                    <div class="menu-button-box">
+                        <button type="submit" id="menuSaveBtn">
+                            登録
+                        </button>
+            
+                        <button
+                            type="button"
+                            id="menuCancelBtn"
+                            hidden
+                        >
+                            キャンセル
+                        </button>
+                    </div>
+            
+                    <p id="menuMessage"></p>
+                </form>
+            
+                <div id="menuList" class="menu-list">
+                    <p>メニューを読み込み中です。</p>
+                </div>
+            </section>
+
+
+
             <div class="home-desc-box">
                 <h2>📌 Cafe Bless 관리자 페이지 사용 설명</h2>
             
@@ -103,7 +229,7 @@
         <!-- main -->
 
         <footer class="manager-footer">
-            <p><small>&copy; Cofe Bless all rights reserved.</small></p>
+            <p><small>&copy; Cafe Bless all rights reserved.</small></p>
         </footer>
         <!-- footer -->
     </div>
