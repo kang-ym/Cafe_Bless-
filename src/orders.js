@@ -1,376 +1,416 @@
-'use strict';
+"use strict";
 
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { getDatabase, ref, get, update, increment } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import {
+  getDatabase,
+  ref,
+  get,
+  update,
+  increment,
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
 const auth = getAuth();
 const db = getDatabase();
 let allOrderData = [];
-let filterSetupDone = false; // ✅ setupFilterButtons가 한 번만 실행되도록 제어
+let activeMenuNames = [];
 
 const selectedOrderIds = new Set(); // 체크한 주문 ID 저장용
 
-
-
 onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        alert("ログインが必要です。");
-        window.location.href = "../index.html";
-        return;
-    }
-    loadOrders();
+  if (!user) {
+    alert("ログインが必要です。");
+    window.location.href = "../index.html";
+    return;
+  }
+  loadOrders();
 });
 
 function loadOrders() {
-    const today = new Date();
-    const dateKey = `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}`;
-    const displayDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-    document.getElementById('orderDate').textContent = displayDate;
+  const today = new Date();
+  const dateKey = `${today.getFullYear()}_${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}_${String(today.getDate()).padStart(2, "0")}`;
+  const displayDate = `${today.getFullYear()}.${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}.${String(today.getDate()).padStart(2, "0")}`;
+  document.getElementById("orderDate").textContent = displayDate;
 
-    const ordersRef = ref(db, `orders/${dateKey}`);
-    get(ordersRef).then(snapshot => {
-        const data = snapshot.val();
-        if (!data) return;
+  const ordersRef = ref(db, `orders/${dateKey}`);
+  const menusRef = ref(db, "menus");
+  Promise.all([get(ordersRef), get(menusRef)])
+    .then(([orderSnapshot, menuSnapshot]) => {
+      const data = orderSnapshot.val() || {};
+      const menus = menuSnapshot.val() || {};
+      if (!data) return;
 
-        allOrderData = Object.entries(data);
-        renderSummaryTable(allOrderData); // ✅ 항상 전체 화면으로 시작
+      allOrderData = Object.entries(data);
+      activeMenuNames = Object.values(menus)
+        .filter((menu) => menu.active !== false)
+        .map((menu) => menu.nameJp);
+      renderSummaryTable(allOrderData); // ✅ 항상 전체 화면으로 시작
 
-        // ✅ 필터 버튼은 1번만 연결
-        if (!filterSetupDone) {
-            setupFilterButtons();
-            filterSetupDone = true;
-        }
+      // ✅ 필터 버튼은 1번만 연결
+      if (!filterSetupDone) {
+        setupFilterButtons();
+        filterSetupDone = true;
+      }
 
-        // ✅ 모든 버튼에서 active 제거
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      // ✅ 모든 버튼에서 active 제거
+      document
+        .querySelectorAll(".filter-btn")
+        .forEach((btn) => btn.classList.remove("active"));
 
-
-        // ✅ 전체 버튼 active 설정
-        const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
-        if (allBtn) allBtn.classList.add('active');
-    }).catch(err => console.error('❌ 주문 불러오기 실패:', err));
+      // ✅ 전체 버튼 active 설정
+      const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+      if (allBtn) allBtn.classList.add("active");
+    })
+    .catch((err) => console.error("❌ 주문 불러오기 실패:", err));
 }
 
-
 function renderSummaryTable(orderArray) {
-    const orderList = document.getElementById('orderList');
-    orderList.innerHTML = '';
+  const orderList = document.getElementById("orderList");
+  orderList.innerHTML = "";
 
-        // ✅ 표 위에 제목 추가
-        const title = document.createElement('h3');
-        title.className = 'order-title';
-        title.textContent = '📋 今日の注文';
-        orderList.appendChild(title);
+  // ✅ 표 위에 제목 추가
+  const title = document.createElement("h3");
+  title.className = "order-title";
+  title.textContent = "📋 今日の注文";
+  orderList.appendChild(title);
 
-    const orderPriority = ['ラテ', 'キャラメルラテ', 'バニララテ', 'アメリカーノ'];
-    const grouped = new Map();
+  const orderPriority = [
+    "ラテ",
+    "キャラメルラテ",
+    "バニララテ",
+    "アメリカーノ",
+  ];
+  const grouped = new Map();
 
-    // 커피 → { cold_L: 수량, hot_R: 수량 } 구조로 집계
-    orderArray.forEach(([_, order]) => {
-        const coffee = order.coffeeJp || order.coffee;
-        const temp = order.temperature;
-        const size = order.size;
-        const quantity = order.quantity || 1;
-        const key = `${temp}_${size}`;
+  // 커피 → { cold_L: 수량, hot_R: 수량 } 구조로 집계
+  orderArray.forEach(([_, order]) => {
+    const coffee = order.coffeeJp || order.coffee;
+    const temp = order.temperature;
+    const size = order.size;
+    const quantity = order.quantity || 1;
+    const key = `${temp}_${size}`;
 
-        if (!grouped.has(coffee)) grouped.set(coffee, {});
-        const target = grouped.get(coffee);
-        target[key] = (target[key] || 0) + quantity;
+    if (!grouped.has(coffee)) grouped.set(coffee, {});
+    const target = grouped.get(coffee);
+    target[key] = (target[key] || 0) + quantity;
+  });
+
+  const sortedCoffees = [...grouped.keys()].sort((a, b) => {
+    const indexA = orderPriority.indexOf(a);
+    const indexB = orderPriority.indexOf(b);
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  const table = document.createElement("table");
+  table.className = "order-table";
+
+  let html =
+    "<thead><tr><th>コーヒー</th><th>温度</th><th>サイズ</th><th>数</th></tr></thead><tbody>";
+
+  sortedCoffees.forEach((coffee) => {
+    const details = grouped.get(coffee);
+
+    // 온도/사이즈 순 정렬: cold → hot, L → R
+    const sortedDetails = Object.entries(details).sort((a, b) => {
+      const [tempA, sizeA] = a[0].split("_");
+      const [tempB, sizeB] = b[0].split("_");
+      if (tempA !== tempB) return tempA === "cold" ? -1 : 1;
+      if (sizeA !== sizeB) return sizeA === "L" ? -1 : 1;
+      return 0;
     });
 
-    const sortedCoffees = [...grouped.keys()].sort((a, b) => {
-        const indexA = orderPriority.indexOf(a);
-        const indexB = orderPriority.indexOf(b);
-        if (indexA === -1 && indexB === -1) return a.localeCompare(b);
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
-        return indexA - indexB;
-    });
-
-    const table = document.createElement('table');
-    table.className = 'order-table';
-
-    let html = '<thead><tr><th>コーヒー</th><th>温度</th><th>サイズ</th><th>数</th></tr></thead><tbody>';
-
-    sortedCoffees.forEach(coffee => {
-        const details = grouped.get(coffee);
-
-        // 온도/사이즈 순 정렬: cold → hot, L → R
-        const sortedDetails = Object.entries(details).sort((a, b) => {
-            const [tempA, sizeA] = a[0].split('_');
-            const [tempB, sizeB] = b[0].split('_');
-            if (tempA !== tempB) return tempA === 'cold' ? -1 : 1;
-            if (sizeA !== sizeB) return sizeA === 'L' ? -1 : 1;
-            return 0;
-        });
-
-        sortedDetails.forEach(([key, count], idx) => {
-            const [temp, size] = key.split('_');
-            const tempText = temp === 'hot' ? '🔥' : '❄️';
-            html += `
+    sortedDetails.forEach(([key, count], idx) => {
+      const [temp, size] = key.split("_");
+      const tempText = temp === "hot" ? "🔥" : "❄️";
+      html += `
                 <tr>
-                    <td>${idx === 0 ? coffee : ''}</td>
+                    <td>${idx === 0 ? coffee : ""}</td>
                     <td>${tempText}</td>
                     <td>${size}</td>
                     <td>${count}</td>
                 </tr>
             `;
-        });
     });
+  });
 
-    html += '</tbody>';
-    table.innerHTML = html;
-    orderList.appendChild(table);
+  html += "</tbody>";
+  table.innerHTML = html;
+  orderList.appendChild(table);
 }
 
 function renderOrders(orderArray) {
-    const orderPriority = ['ラテ', 'キャラメルラテ', 'バニララテ', 'アメリカーノ'];
-    const sorted = orderArray.sort((a, b) => {
-        const nameA = a[1].coffeeJp || a[1].coffee;
-        const nameB = b[1].coffeeJp || b[1].coffee;
-        const indexA = orderPriority.indexOf(nameA);
-        const indexB = orderPriority.indexOf(nameB);
-        if (indexA !== indexB) return indexA - indexB;
+  const orderPriority = [
+    "ラテ",
+    "キャラメルラテ",
+    "バニララテ",
+    "アメリカーノ",
+  ];
+  const sorted = orderArray.sort((a, b) => {
+    const nameA = a[1].coffeeJp || a[1].coffee;
+    const nameB = b[1].coffeeJp || b[1].coffee;
+    const indexA = orderPriority.indexOf(nameA);
+    const indexB = orderPriority.indexOf(nameB);
+    if (indexA !== indexB) return indexA - indexB;
 
-        const tempA = a[1].temperature;
-        const tempB = b[1].temperature;
-        if (tempA !== tempB) return tempA === 'cold' ? -1 : 1;
+    const tempA = a[1].temperature;
+    const tempB = b[1].temperature;
+    if (tempA !== tempB) return tempA === "cold" ? -1 : 1;
 
-        const sizeA = a[1].size;
-        const sizeB = b[1].size;
-        if (sizeA !== sizeB) return sizeA === 'L' ? -1 : 1;
+    const sizeA = a[1].size;
+    const sizeB = b[1].size;
+    if (sizeA !== sizeB) return sizeA === "L" ? -1 : 1;
 
-        return 0;
-    });
+    return 0;
+  });
 
-    const orderList = document.getElementById('orderList');
-    orderList.innerHTML = '';
+  const orderList = document.getElementById("orderList");
+  orderList.innerHTML = "";
 
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    let allOrders = [];
-    
-    // ✅ 커피 이름 추출
-    let coffeeTitle = '';
-    if (orderArray.length > 0) {
-        const firstOrder = orderArray[0][1];
-        coffeeTitle = firstOrder.coffeeJp || firstOrder.coffee || '';
-    } else {
-        // ✅ orderArray가 비어 있을 경우 → 현재 active 버튼에서 이름 추출
-        const activeBtn = document.querySelector('.filter-btn.active');
-        coffeeTitle = activeBtn?.dataset.filter || '';
-    }
+  const filterButtons = document.querySelectorAll(".filter-btn");
+  let allOrders = [];
 
-    // ✅ 제목 추가 (주문 없어도 보여줌)
-    const title = document.createElement('h3');
-    title.className = 'order-title';
-    title.textContent = `☕ ${coffeeTitle}`;
-    orderList.appendChild(title);
+  // ✅ 커피 이름 추출
+  let coffeeTitle = "";
+  if (orderArray.length > 0) {
+    const firstOrder = orderArray[0][1];
+    coffeeTitle = firstOrder.coffeeJp || firstOrder.coffee || "";
+  } else {
+    // ✅ orderArray가 비어 있을 경우 → 현재 active 버튼에서 이름 추출
+    const activeBtn = document.querySelector(".filter-btn.active");
+    coffeeTitle = activeBtn?.dataset.filter || "";
+  }
 
-    if (sorted.length === 0) {
-        const emptyMsg = document.createElement('p');
-        emptyMsg.textContent = '注文はありません。';
-        emptyMsg.style.textAlign = 'center';
-        orderList.appendChild(emptyMsg);
-        return;
-    }
+  // ✅ 제목 추가 (주문 없어도 보여줌)
+  const title = document.createElement("h3");
+  title.className = "order-title";
+  title.textContent = `☕ ${coffeeTitle}`;
+  orderList.appendChild(title);
 
-    
+  if (sorted.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.textContent = "注文はありません。";
+    emptyMsg.style.textAlign = "center";
+    orderList.appendChild(emptyMsg);
+    return;
+  }
 
-    // ✅ 주문 테이블 생성
-    const table = document.createElement('table');
-    table.className = 'order-table';
+  // ✅ 주문 테이블 생성
+  const table = document.createElement("table");
+  table.className = "order-table";
 
-    let thead = `
+  let thead = `
         <thead>
             <tr><th>削除</th><th>温度</th><th>サイズ</th><th>名前</th><th>完了</th></tr>
         </thead><tbody>
     `;
-    let tbody = '';
+  let tbody = "";
 
-    sorted.forEach(([id, order]) => {
-        const hotOrCold = order.temperature === 'hot' ? '🔥' : '❄️';
-        const sent = order.sentToLedger === true;
-        tbody += `
+  sorted.forEach(([id, order]) => {
+    const hotOrCold = order.temperature === "hot" ? "🔥" : "❄️";
+    const sent = order.sentToLedger === true;
+    tbody += `
             <tr id="order-${id}">
                 <td><button class="delete-btn" data-id="${id}">🗑</button></td>
                 <td>${hotOrCold}</td>
                 <td>${order.size}</td>
                 <td class="wide-name">
-                    ${order.name}${order.quantity > 1 ? ` (x${order.quantity})` : ''}
+                    ${order.name}${
+      order.quantity > 1 ? ` (x${order.quantity})` : ""
+    }
                 </td>
                 <td>
-                    ${sent
-                    ? '<span style="color: green; font-weight: bold;">送信完了</span>'
-                    : `<input type="checkbox" class="send-checkbox" data-id="${id}" ${selectedOrderIds.has(id) ? 'checked' : ''}>`}
+                    ${
+                      sent
+                        ? '<span style="color: green; font-weight: bold;">送信完了</span>'
+                        : `<input type="checkbox" class="send-checkbox" data-id="${id}" ${
+                            selectedOrderIds.has(id) ? "checked" : ""
+                          }>`
+                    }
                 </td>
             </tr>
         `;
-    });
+  });
 
-    table.innerHTML = thead + tbody + '</tbody>';
-    orderList.appendChild(table);
+  table.innerHTML = thead + tbody + "</tbody>";
+  orderList.appendChild(table);
 
-    document.querySelectorAll('.send-checkbox').forEach(cb => {
-        cb.addEventListener('change', () => {
-            const id = cb.dataset.id;
-            if (cb.checked) {
-                selectedOrderIds.add(id);
-            } else {
-                selectedOrderIds.delete(id);
-            }
-        });
+  document.querySelectorAll(".send-checkbox").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      const id = cb.dataset.id;
+      if (cb.checked) {
+        selectedOrderIds.add(id);
+      } else {
+        selectedOrderIds.delete(id);
+      }
     });
-    
-    setupDeleteButtons(); // 삭제 버튼 연결
+  });
+
+  setupDeleteButtons(); // 삭제 버튼 연결
 }
 
 function setupFilterButtons() {
-    const buttons = document.querySelectorAll('.filter-btn');
+  const buttons = document.querySelectorAll(".filter-btn");
 
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const filter = btn.dataset.filter;
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const filter = btn.dataset.filter;
 
-            // 모든 버튼에서 active 제거 후 클릭한 버튼에 추가
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+      // 모든 버튼에서 active 제거 후 클릭한 버튼에 추가
+      buttons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
 
-            const filtered = (filter === 'all')
-                ? allOrderData
-                : allOrderData.filter(([_, o]) => (o.coffeeJp || o.coffee) === filter);
+      const filtered =
+        filter === "all"
+          ? allOrderData
+          : allOrderData.filter(
+              ([_, o]) => (o.coffeeJp || o.coffee) === filter
+            );
 
-            if (filter === 'all') {
-                renderSummaryTable(filtered);
-            } else {
-                renderOrders(filtered); // ← 필요 시 renderOrders(filtered, filter)도 가능
-            }
-        });
+      if (filter === "all") {
+        renderSummaryTable(filtered);
+      } else {
+        renderOrders(filtered); // ← 필요 시 renderOrders(filtered, filter)도 가능
+      }
     });
+  });
 }
-
 
 function setupDeleteButtons() {
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const id = btn.dataset.id;
-            const confirmed = confirm("この注文を1つ削除しますか？");
-            if (!confirmed) return;
+  document.querySelectorAll(".delete-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const confirmed = confirm("この注文を1つ削除しますか？");
+      if (!confirmed) return;
 
-            const today = new Date();
-            const dateKey = `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}`;
-            const orderRef = ref(db, `orders/${dateKey}/${id}`);
-            const snapshot = await get(orderRef);
+      const today = new Date();
+      const dateKey = `${today.getFullYear()}_${String(
+        today.getMonth() + 1
+      ).padStart(2, "0")}_${String(today.getDate()).padStart(2, "0")}`;
+      const orderRef = ref(db, `orders/${dateKey}/${id}`);
+      const snapshot = await get(orderRef);
 
-            if (!snapshot.exists()) {
-                alert("⚠️ 注文が存在しません");
-                return;
-            }
+      if (!snapshot.exists()) {
+        alert("⚠️ 注文が存在しません");
+        return;
+      }
 
-            const order = snapshot.val();
-            const updates = {};
+      const order = snapshot.val();
+      const updates = {};
 
-            if (order.quantity && order.quantity > 1) {
-                updates[`orders/${dateKey}/${id}/quantity`] = order.quantity - 1;
-            } else {
-                updates[`orders/${dateKey}/${id}`] = null; // 완전 삭제
-            }
+      if (order.quantity && order.quantity > 1) {
+        updates[`orders/${dateKey}/${id}/quantity`] = order.quantity - 1;
+      } else {
+        updates[`orders/${dateKey}/${id}`] = null; // 완전 삭제
+      }
 
-            await update(ref(db), updates);
+      await update(ref(db), updates);
 
-            alert("✅ 注文を1つ削除しました");
-            loadOrders(); // 삭제 후 화면 갱신
-        });
+      alert("✅ 注文を1つ削除しました");
+      loadOrders(); // 삭제 후 화면 갱신
     });
+  });
 }
 
-
-
-
 // ✅ Ledger 전송 처리
-document.getElementById('sendToLedgerBtn')?.addEventListener('click', async () => {
+document
+  .getElementById("sendToLedgerBtn")
+  ?.addEventListener("click", async () => {
     const today = new Date();
-    const dateKey = `${today.getFullYear()}_${String(today.getMonth() + 1).padStart(2, '0')}_${String(today.getDate()).padStart(2, '0')}`;
+    const dateKey = `${today.getFullYear()}_${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}_${String(today.getDate()).padStart(2, "0")}`;
     const ordersRef = ref(db, `orders/${dateKey}`);
     const ordersSnap = await get(ordersRef);
     if (!ordersSnap.exists()) return alert("📦 注文が存在しません");
 
     const orders = ordersSnap.val();
     if (selectedOrderIds.size === 0) {
-        return alert("☑ 完了チェックをした注文だけ送信できます。");
+      return alert("☑ 完了チェックをした注文だけ送信できます。");
     }
-    
 
     const [ledgerSnap, aliasSnap] = await Promise.all([
-        get(ref(db, 'ledgerNames')),
-        get(ref(db, 'nameAlias'))
+      get(ref(db, "ledgerNames")),
+      get(ref(db, "nameAlias")),
     ]);
     const ledgerNames = ledgerSnap.val() || {};
     const aliasMap = aliasSnap.val() || {};
     const updates = {};
 
-    for (const id of selectedOrderIds){
-        const order = orders[id];
-        if (!order || order.sentToLedger === true) continue;
-    
-        const group = order.group || 'guest';
-        const originalName = order.name;
-        const realName = aliasMap[originalName] || originalName;
-        const amount = -(order.price || 0);
-    
-        const base = `ledger/${group}/${realName}`;
-        const recordPath = `${base}/records/${dateKey}`;
-        const balancePath = `${base}/balance`;
-    
-        // ✅ 잔액 차감
-        updates[balancePath] = increment(amount);
-    
-        // ✅ 주문 상태 업데이트
-        updates[`orders/${dateKey}/${id}/sentToLedger`] = true;
-    
-        // ✅ ledgerNames 없으면 추가
-        if (!ledgerNames?.[group]?.[realName]) {
-            updates[`ledgerNames/${group}/${realName}`] = true;
-        }
-    
-        // ✅ recordPath의 기존 값 가져와 배열로 누적
-        const recordRef = ref(db, recordPath);
-        const snapshot = await get(recordRef);
-        const existing = snapshot.val();
-    
-        const newValue = Array.isArray(existing)
-            ? [...existing, amount]
-            : (existing !== null ? [existing, amount] : [amount]);
-    
-        await update(ref(db), {
-            [recordPath]: newValue
-        });
-    };
-    
+    for (const id of selectedOrderIds) {
+      const order = orders[id];
+      if (!order || order.sentToLedger === true) continue;
+
+      const group = order.group || "guest";
+      const originalName = order.name;
+      const realName = aliasMap[originalName] || originalName;
+      const amount = -(order.price || 0);
+
+      const base = `ledger/${group}/${realName}`;
+      const recordPath = `${base}/records/${dateKey}`;
+      const balancePath = `${base}/balance`;
+
+      // ✅ 잔액 차감
+      updates[balancePath] = increment(amount);
+
+      // ✅ 주문 상태 업데이트
+      updates[`orders/${dateKey}/${id}/sentToLedger`] = true;
+
+      // ✅ ledgerNames 없으면 추가
+      if (!ledgerNames?.[group]?.[realName]) {
+        updates[`ledgerNames/${group}/${realName}`] = true;
+      }
+
+      // ✅ recordPath의 기존 값 가져와 배열로 누적
+      const recordRef = ref(db, recordPath);
+      const snapshot = await get(recordRef);
+      const existing = snapshot.val();
+
+      const newValue = Array.isArray(existing)
+        ? [...existing, amount]
+        : existing !== null
+        ? [existing, amount]
+        : [amount];
+
+      await update(ref(db), {
+        [recordPath]: newValue,
+      });
+    }
 
     await update(ref(db), updates);
 
     // ✅ Ledger 전송 후 최신 주문 데이터 다시 불러오기
-const newSnap = await get(ordersRef);
-if (newSnap.exists()) {
-    allOrderData = Object.entries(newSnap.val());
-}
+    const newSnap = await get(ordersRef);
+    if (newSnap.exists()) {
+      allOrderData = Object.entries(newSnap.val());
+    }
 
-    
-// ✅ 선택 ID 모두 제거
-selectedOrderIds.clear();
+    // ✅ 선택 ID 모두 제거
+    selectedOrderIds.clear();
 
-// ✅ 현재 필터된 커피 다시 렌더링하여 UI 반영
-const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-const filtered = (activeFilter === 'all')
-    ? allOrderData
-    : allOrderData.filter(([_, o]) => (o.coffeeJp || o.coffee) === activeFilter);
+    // ✅ 현재 필터된 커피 다시 렌더링하여 UI 반영
+    const activeFilter =
+      document.querySelector(".filter-btn.active")?.dataset.filter || "all";
+    const filtered =
+      activeFilter === "all"
+        ? allOrderData
+        : allOrderData.filter(
+            ([_, o]) => (o.coffeeJp || o.coffee) === activeFilter
+          );
 
-if (activeFilter === 'all') {
-    renderSummaryTable(filtered);
-} else {
-    renderOrders(filtered);
-}
-
+    if (activeFilter === "all") {
+      renderSummaryTable(filtered);
+    } else {
+      renderOrders(filtered);
+    }
 
     alert("✅ Ledger に送信しました！");
-});
+  });
